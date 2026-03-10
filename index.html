@@ -1,0 +1,2218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>12 Million Calls Initiative</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300;1,9..144,400&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f2ec;
+    --bg2: #edeae2;
+    --surface: #ffffff;
+    --surface2: #f0ede6;
+    --border: rgba(30,25,15,0.1);
+    --border-strong: rgba(30,25,15,0.2);
+    --text: #1a1710;
+    --text-muted: rgba(26,23,16,0.55);
+    --text-dim: rgba(26,23,16,0.35);
+    --accent: #b5873c;
+    --accent-dark: #8a6228;
+    --accent-bg: rgba(181,135,60,0.08);
+    --nav-bg: rgba(245,242,236,0.96);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-weight: 300;
+    font-size: 17px;
+    line-height: 1.65;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3 { font-family: 'Fraunces', serif; font-weight: 400; line-height: 1.15; }
+  h1 { font-size: clamp(2.6rem, 5.5vw, 4.8rem); }
+  h2 { font-size: clamp(1.7rem, 3vw, 2.6rem); }
+  h3 { font-size: clamp(1.1rem, 1.8vw, 1.4rem); font-weight: 300; }
+
+  p { margin-bottom: 1.1rem; color: rgba(26,23,16,0.72); }
+  p:last-child { margin-bottom: 0; }
+  strong { font-weight: 500; color: var(--text); }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 48px; }
+  .container-wide { max-width: 1400px; margin: 0 auto; padding: 0 48px; }
+
+  .page { display: none; min-height: 100vh; }
+  .page.active { display: block; animation: fadeIn 0.35s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  hr.divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+  .section-label {
+    font-size: 0.68rem; font-weight: 600; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; display: block;
+  }
+
+  /* ===================== NAV ===================== */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: var(--nav-bg);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-inner {
+    max-width: 1400px; margin: 0 auto; padding: 0 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 60px;
+  }
+
+  .nav-logo {
+    font-family: 'Fraunces', serif;
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--text);
+    cursor: pointer; text-decoration: none; background: none; border: none;
+    white-space: nowrap; letter-spacing: -0.01em;
+  }
+
+  .nav-links { display: flex; align-items: center; gap: 2rem; }
+
+  .nav-link {
+    font-size: 0.75rem; font-weight: 500; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--text-muted);
+    cursor: pointer; text-decoration: none; background: none; border: none;
+    transition: color 0.2s;
+  }
+  .nav-link:hover, .nav-link.active { color: var(--text); }
+
+  .nav-cta {
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--surface); background: var(--text);
+    border: none; padding: 9px 20px; cursor: pointer; transition: background 0.2s;
+  }
+  .nav-cta:hover { background: var(--accent); }
+
+  /* ===================== BUTTONS ===================== */
+  .btn {
+    display: inline-block; font-size: 0.73rem; font-weight: 500;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 13px 30px; cursor: pointer; text-decoration: none;
+    border: none; transition: all 0.2s;
+  }
+  .btn-primary { background: var(--text); color: var(--bg); }
+  .btn-primary:hover { background: var(--accent); }
+  .btn-outline { background: transparent; color: var(--text); border: 1.5px solid var(--border-strong); }
+  .btn-outline:hover { border-color: var(--text); }
+  .btn-text { background: transparent; color: var(--accent); padding-left: 0; padding-right: 0; font-size: 0.78rem; }
+  .btn-text::after { content: ' →'; }
+  .btn-text:hover { color: var(--accent-dark); }
+
+  /* ===================== PLACEHOLDERS ===================== */
+  .placeholder-video {
+    background: var(--bg2); border: 1px solid var(--border);
+    position: relative; overflow: hidden;
+  }
+  .placeholder-video::before { content: ''; display: block; padding-top: 56.25%; }
+  .placeholder-video-inner {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 10px; padding: 20px; text-align: center;
+  }
+  .play-icon {
+    width: 52px; height: 52px; border: 1.5px solid rgba(26,23,16,0.2);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .play-icon svg { fill: rgba(26,23,16,0.3); margin-left: 3px; }
+  .placeholder-label { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-dim); }
+  .placeholder-sublabel { font-size: 0.78rem; color: var(--text-muted); line-height: 1.4; }
+
+  .placeholder-map {
+    background: var(--bg2); border: 1px solid var(--border); height: 420px;
+    display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 14px;
+  }
+
+  /* ===================== HOMEPAGE ===================== */
+  .hero {
+    padding-top: 60px; min-height: 100vh; position: relative;
+    display: flex; align-items: center;
+    background: linear-gradient(160deg, #f5f2ec 0%, #ede9e0 60%, #e8e2d6 100%);
+    overflow: hidden;
+  }
+  .hero-texture {
+    position: absolute; inset: 0; pointer-events: none;
+    background-image: radial-gradient(rgba(181,135,60,0.06) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  .hero-accent-line {
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+  }
+  .hero-content {
+    position: relative; z-index: 1;
+    max-width: 1400px; margin: 0 auto; padding: 80px 48px 120px;
+  }
+  .hero-eyebrow {
+    font-size: 0.68rem; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 1.8rem; display: flex; align-items: center; gap: 12px;
+  }
+  .hero-eyebrow::before { content: ''; width: 28px; height: 1.5px; background: var(--accent); display: block; }
+
+  .hero-headline {
+    font-family: 'Fraunces', serif; font-size: clamp(3rem, 6.5vw, 6rem);
+    font-weight: 400; line-height: 1.06; letter-spacing: -0.02em;
+    max-width: 18ch; margin-bottom: 1.8rem; color: var(--text);
+  }
+  .hero-headline em { font-style: italic; color: var(--accent); }
+
+  .hero-sub {
+    font-size: clamp(1.05rem, 1.7vw, 1.28rem); font-weight: 300; line-height: 1.65;
+    color: rgba(26,23,16,0.65); max-width: 50ch; margin-bottom: 2.8rem;
+  }
+
+  /* Visual note: inline, not block-expanding */
+  .inline-visual-note {
+    display: flex; gap: 10px; align-items: flex-start;
+    margin-top: 20px; /* sits inside same content flow, no extra bg/border block */
+  }
+  .ivn-label {
+    font-size: 0.6rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--accent); flex-shrink: 0; padding-top: 3px; opacity: 0.7;
+  }
+  .ivn-text { font-size: 0.78rem; color: var(--text-dim); line-height: 1.5; font-style: italic; }
+
+  /* INTRO BLOCK */
+  .intro-block { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 96px 0; }
+  .intro-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 80px; align-items: center; }
+  .intro-text { font-size: 1.15rem; line-height: 1.72; font-weight: 300; color: rgba(26,23,16,0.8); }
+  .intro-ctas { display: flex; flex-direction: column; }
+  .intro-cta-item {
+    border-top: 1px solid var(--border); padding: 18px 0;
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer; transition: padding-left 0.2s;
+  }
+  .intro-cta-item:last-child { border-bottom: 1px solid var(--border); }
+  .intro-cta-item:hover { padding-left: 10px; }
+  .intro-cta-title { font-size: 0.78rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text); }
+  .intro-cta-arrow { color: var(--accent); font-size: 1.1rem; }
+
+  /* VIDEO TEASER */
+  .video-teaser { padding: 96px 0; }
+  .video-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; margin-top: 36px; }
+
+  /* MISCONCEPTIONS ACCORDION */
+  .misconceptions { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 96px 0; }
+  .misc-layout { display: grid; grid-template-columns: 1fr 1.5fr; gap: 0; margin-top: 48px; }
+  .misc-truths { border-right: 1px solid var(--border); }
+  .misc-truth-item {
+    padding: 22px 28px 22px 0;
+    border-bottom: 1px solid var(--border); cursor: pointer;
+    transition: all 0.2s; position: relative;
+  }
+  .misc-truth-item:first-child { border-top: 1px solid var(--border); }
+  .misc-truth-item.active { background: var(--accent-bg); }
+  .misc-truth-item.active .misc-truth-text { color: var(--accent); }
+  .misc-truth-item::after {
+    content: '→'; position: absolute; right: -14px; top: 50%;
+    transform: translateY(-50%); color: var(--accent);
+    font-size: 1rem; opacity: 0; transition: opacity 0.2s;
+    background: var(--surface); padding: 2px 4px;
+  }
+  .misc-truth-item.active::after { opacity: 1; }
+  .misc-truth-text {
+    font-family: 'Fraunces', serif; font-size: clamp(1rem, 1.6vw, 1.25rem);
+    font-weight: 400; line-height: 1.3; color: var(--text); transition: color 0.2s;
+  }
+  .misc-detail-panel { padding: 0 0 0 48px; position: relative; }
+  .misc-detail-inner {
+    padding-top: 22px; /* aligns with first item top border */
+  }
+  .misc-detail {
+    display: none; animation: fadeIn 0.25s ease;
+  }
+  .misc-detail.active { display: block; }
+  .misc-detail-label {
+    font-size: 0.65rem; font-weight: 600; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 14px; display: block;
+  }
+  .misc-detail h3 {
+    font-family: 'Fraunces', serif; font-size: 1.35rem; font-weight: 400;
+    margin-bottom: 16px; color: var(--text);
+  }
+  .misc-detail p { font-size: 0.95rem; line-height: 1.72; }
+
+  /* MAP */
+  .map-block { padding: 96px 0; }
+  .map-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 72px; align-items: center; margin-top: 0; }
+
+  /* NEWS */
+  .news-block { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 72px 0; }
+  .news-track { display: flex; gap: 1px; margin-top: 36px; }
+  .news-item { flex: 1; min-width: 0; background: var(--bg2); padding: 24px 22px; }
+  .news-outlet { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+  .news-headline { font-family: 'Fraunces', serif; font-size: 0.98rem; font-weight: 400; line-height: 1.35; color: var(--text); margin-bottom: 8px; }
+  .news-date { font-size: 0.7rem; color: var(--text-dim); }
+
+  /* ABOUT END */
+  .about-end { padding: 96px 0; text-align: center; }
+
+  /* ===================== RESPONSE PAGE ===================== */
+  .response-hero { padding: 140px 0 72px; border-bottom: 1px solid var(--border); }
+
+  .sticky-nav {
+    position: sticky; top: 60px; z-index: 50;
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 48px;
+  }
+  .sticky-nav-inner { max-width: 1200px; margin: 0 auto; display: flex; overflow-x: auto; }
+  .sticky-nav-btn {
+    font-size: 0.68rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text-muted); padding: 16px 22px; cursor: pointer; white-space: nowrap;
+    border: none; background: none; border-bottom: 2px solid transparent; transition: all 0.2s;
+  }
+  .sticky-nav-btn:hover { color: var(--text); }
+  .sticky-nav-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .response-component { padding: 72px 0; border-bottom: 1px solid var(--border); }
+  .component-header { display: grid; grid-template-columns: 56px 1fr; gap: 20px; align-items: start; margin-bottom: 44px; }
+  .component-number { font-family: 'Fraunces', serif; font-size: 2.8rem; font-weight: 300; color: var(--accent); line-height: 1; }
+
+  /* 7-STEP INTERACTIVE CARDS */
+  .steps-list { display: flex; flex-direction: column; gap: 0; margin-top: 36px; }
+
+  .step-row {
+    border-top: 1px solid var(--border); overflow: hidden; transition: background 0.2s;
+  }
+  .step-row:last-child { border-bottom: 1px solid var(--border); }
+
+  .step-header {
+    display: flex; align-items: center; gap: 24px; padding: 20px 0;
+    cursor: pointer; transition: all 0.2s; user-select: none;
+  }
+  .step-header:hover { padding-left: 8px; }
+  .step-row.open .step-header { padding-left: 0; }
+
+  .step-num-badge {
+    width: 28px; height: 28px; border-radius: 50%; background: var(--bg2);
+    border: 1.5px solid var(--border); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.62rem; font-weight: 700; letter-spacing: 0.05em; color: var(--text-muted);
+    transition: all 0.2s;
+  }
+  .step-row.open .step-num-badge { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+
+  .step-header-title { font-family: 'Fraunces', serif; font-size: 1.15rem; font-weight: 400; flex: 1; }
+  .step-toggle { color: var(--text-dim); font-size: 1.1rem; transition: transform 0.3s; flex-shrink: 0; }
+  .step-row.open .step-toggle { transform: rotate(45deg); color: var(--accent); }
+
+  .step-body-content {
+    max-height: 0; overflow: hidden; transition: max-height 0.4s ease;
+  }
+  .step-row.open .step-body-content { max-height: 800px; }
+
+  .step-editorial {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 32px;
+    padding: 0 0 32px 52px;
+  }
+
+  .step-text-col p { font-size: 0.95rem; line-height: 1.7; }
+
+  .step-media-col { display: flex; flex-direction: column; gap: 8px; }
+
+  .step-media-item {
+    background: var(--bg2); border: 1px solid var(--border);
+    display: flex; align-items: center; gap: 14px; padding: 14px 16px;
+  }
+  .media-icon {
+    width: 32px; height: 32px; flex-shrink: 0; background: var(--surface);
+    border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+  }
+  .media-icon svg { fill: var(--accent); }
+  .media-item-info {}
+  .media-item-type { font-size: 0.58rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); }
+  .media-item-label { font-size: 0.8rem; color: var(--text-muted); }
+
+  .step-program-tag {
+    display: inline-block; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.12em;
+    text-transform: uppercase; border: 1px solid var(--accent); color: var(--accent);
+    padding: 4px 10px; margin-top: 12px;
+  }
+
+  /* ALTERNATE DESTINATIONS, SECOND RESPONSE */
+  .destinations-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; margin-top: 36px; }
+  .dest-card { background: var(--surface); padding: 28px 24px; border-left: 3px solid var(--border); transition: border-color 0.2s; }
+  .dest-card:hover { border-left-color: var(--accent); }
+  .dest-title { font-family: 'Fraunces', serif; font-size: 1.05rem; margin-bottom: 8px; }
+  .dest-body { font-size: 0.82rem; color: var(--text-muted); line-height: 1.5; }
+
+  .diversion-list { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-top: 36px; }
+  .diversion-item { background: var(--surface); padding: 26px 24px; display: flex; gap: 14px; align-items: flex-start; }
+  .diversion-dot { width: 7px; height: 7px; background: var(--accent); flex-shrink: 0; margin-top: 7px; }
+  .diversion-body { font-size: 0.9rem; line-height: 1.55; color: rgba(26,23,16,0.75); }
+
+  /* ===================== RESPONDERS PAGE ===================== */
+  .responders-hero {
+    padding: 140px 0 0;
+    background: var(--bg);
+  }
+
+  .responders-hero-inner {
+    padding-bottom: 48px;
+  }
+
+  .filter-bar {
+    background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    position: sticky; top: 60px; z-index: 50;
+  }
+  .filter-inner {
+    max-width: 1400px; margin: 0 auto; padding: 0 48px;
+    display: flex; align-items: center; gap: 0;
+  }
+  .filter-label {
+    font-size: 0.62rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--text-dim); padding: 14px 20px 14px 0; flex-shrink: 0; border-right: 1px solid var(--border);
+    margin-right: 0;
+  }
+  .filter-section { display: flex; align-items: center; padding: 0 20px; border-right: 1px solid var(--border); }
+  .filter-section-label {
+    font-size: 0.6rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--text-dim); margin-right: 10px; flex-shrink: 0;
+  }
+  .filter-group { display: flex; flex-wrap: wrap; }
+  .filter-btn {
+    font-size: 0.68rem; font-weight: 400; letter-spacing: 0.04em;
+    color: var(--text-muted); background: none; border: none;
+    padding: 14px 10px; cursor: pointer; transition: color 0.2s; white-space: nowrap;
+    border-bottom: 2px solid transparent;
+  }
+  .filter-btn:hover { color: var(--text); }
+  .filter-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* Show tops of video cards on landing — peek of first row */
+  .video-archive-peek {
+    padding-top: 0;
+    /* First row fully visible, second row partially visible to signal scrollability */
+  }
+
+  .archive-label { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent); padding: 40px 48px 20px; max-width: 1400px; margin: 0 auto; display: block; }
+
+  .archive-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+    max-width: 1400px; margin: 0 auto; padding: 0 48px 80px;
+  }
+
+  .video-card { background: var(--surface2); cursor: pointer; overflow: hidden; transition: box-shadow 0.2s; }
+  .video-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+
+  .video-card-thumb { position: relative; }
+  .video-card-thumb::before { content: ''; display: block; padding-top: 58%; }
+  .video-card-thumb-inner {
+    position: absolute; inset: 0; background: var(--bg2);
+    display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 8px;
+  }
+  .video-card-overlay {
+    position: absolute; inset: 0; background: rgba(181,135,60,0.1);
+    opacity: 0; transition: opacity 0.3s; display: flex; align-items: center; justify-content: center;
+  }
+  .video-card:hover .video-card-overlay { opacity: 1; }
+
+  .video-card-info { padding: 16px 18px 20px; }
+  .video-card-role { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 5px; }
+  .video-card-name { font-family: 'Fraunces', serif; font-size: 1rem; margin-bottom: 4px; }
+  .video-card-loc { font-size: 0.75rem; color: var(--text-muted); }
+
+  /* ===================== EVIDENCE PAGE ===================== */
+  .evidence-hero { padding: 140px 0 72px; border-bottom: 1px solid var(--border); }
+
+  .findings-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; margin-top: 52px; }
+  .finding-card { background: var(--surface); padding: 32px 26px; border-top: 3px solid var(--accent); }
+  .finding-title { font-family: 'Fraunces', serif; font-size: 1.3rem; font-style: italic; margin-bottom: 14px; }
+  .finding-body { font-size: 0.85rem; line-height: 1.68; color: rgba(26,23,16,0.7); }
+
+  .numbers-band { background: var(--text); padding: 72px 0; }
+  .numbers-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; text-align: center; }
+  .number-big { font-family: 'Fraunces', serif; font-size: clamp(2.8rem, 5vw, 4rem); font-weight: 300; color: var(--accent); line-height: 1; margin-bottom: 8px; }
+  .number-label { font-size: 0.8rem; color: rgba(245,242,236,0.6); line-height: 1.4; }
+
+  .reports-section { padding: 72px 0; }
+  .report-filters { display: flex; gap: 2px; margin-bottom: 28px; flex-wrap: wrap; }
+  .report-filter { font-size: 0.68rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; padding: 9px 18px; background: var(--surface); color: var(--text-muted); cursor: pointer; border: none; transition: all 0.2s; }
+  .report-filter:hover { color: var(--text); }
+  .report-filter.active { background: var(--text); color: var(--bg); }
+  .reports-list { display: flex; flex-direction: column; }
+  .report-item { border-top: 1px solid var(--border); padding: 22px 0; display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: center; cursor: pointer; transition: padding-left 0.2s; }
+  .report-item:last-child { border-bottom: 1px solid var(--border); }
+  .report-item:hover { padding-left: 10px; }
+  .report-type { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 5px; }
+  .report-title { font-family: 'Fraunces', serif; font-size: 1rem; font-weight: 400; margin-bottom: 3px; }
+  .report-meta { font-size: 0.75rem; color: var(--text-muted); }
+  .report-arrow { color: var(--accent); font-size: 1.1rem; }
+
+  /* ===================== ABOUT PAGE ===================== */
+  .about-hero { padding: 140px 0 72px; border-bottom: 1px solid var(--border); }
+
+  .why-block { padding: 96px 0; }
+  .why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; }
+  .why-pull { font-family: 'Fraunces', serif; font-size: clamp(1.6rem, 2.8vw, 2.2rem); font-weight: 300; line-height: 1.3; color: var(--accent); border-left: 3px solid var(--accent); padding-left: 28px; font-style: italic; }
+
+  .partners-block { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 96px 0; }
+  .partner-card-single { max-width: 700px; }
+  .partner-name { font-family: 'Fraunces', serif; font-size: 1.5rem; margin-bottom: 16px; }
+  .partner-body { font-size: 0.95rem; line-height: 1.75; color: rgba(26,23,16,0.72); }
+
+  .approach-block { padding: 96px 0; }
+  .approach-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: start; }
+  .values-list { display: flex; flex-direction: column; margin-top: 12px; }
+  .value-item { border-top: 1px solid var(--border); padding: 16px 0; font-size: 0.93rem; color: rgba(26,23,16,0.78); line-height: 1.5; display: flex; gap: 14px; align-items: flex-start; }
+  .value-item:last-child { border-bottom: 1px solid var(--border); }
+  .value-dot { width: 6px; height: 6px; background: var(--accent); flex-shrink: 0; margin-top: 7px; }
+
+  /* ===================== GET INVOLVED ===================== */
+  .gi-hero { padding: 140px 0 72px; border-bottom: 1px solid var(--border); }
+  .audiences-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+  .audience-card { background: var(--surface); padding: 40px 36px; position: relative; overflow: hidden; transition: background 0.2s; }
+  .audience-card:hover { background: var(--surface2); }
+  .audience-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform 0.3s; }
+  .audience-card:hover::before { transform: scaleX(1); }
+  .audience-title { font-family: 'Fraunces', serif; font-size: 1.35rem; margin-bottom: 18px; }
+  .audience-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 26px; }
+  .audience-item { font-size: 0.87rem; color: rgba(26,23,16,0.72); padding-left: 14px; position: relative; line-height: 1.5; }
+  .audience-item::before { content: '–'; position: absolute; left: 0; color: var(--accent); }
+
+  .contact-block { background: var(--surface); border-top: 1px solid var(--border); padding: 96px 0; }
+  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: start; }
+  .form-placeholder { background: var(--bg2); border: 1px solid var(--border); padding: 36px; display: flex; flex-direction: column; gap: 14px; }
+  .form-field-placeholder { background: var(--surface); border: 1px solid var(--border); height: 46px; padding: 0 14px; display: flex; align-items: center; }
+  .form-field-label-text { font-size: 0.68rem; color: var(--text-dim); }
+  .form-field-placeholder.textarea { height: 110px; align-items: flex-start; padding-top: 13px; }
+
+  /* ===================== FOOTER ===================== */
+  footer { background: var(--text); padding: 56px 0 36px; }
+  .footer-inner { max-width: 1400px; margin: 0 auto; padding: 0 48px; }
+  .footer-top { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 40px; padding-bottom: 44px; border-bottom: 1px solid rgba(245,242,236,0.12); }
+  .footer-logo { font-family: 'Fraunces', serif; font-size: 1rem; font-weight: 400; color: var(--bg); margin-bottom: 12px; display: block; }
+  .footer-tagline { font-size: 0.8rem; color: rgba(245,242,236,0.45); line-height: 1.6; }
+  .footer-col-title { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(181,135,60,0.8); margin-bottom: 14px; }
+  .footer-links { display: flex; flex-direction: column; gap: 8px; }
+  .footer-link { font-size: 0.8rem; color: rgba(245,242,236,0.5); cursor: pointer; text-decoration: none; transition: color 0.2s; background: none; border: none; text-align: left; }
+  .footer-link:hover { color: rgba(245,242,236,0.85); }
+  .footer-bottom { padding-top: 24px; display: flex; justify-content: space-between; align-items: center; }
+  .footer-legal { font-size: 0.7rem; color: rgba(245,242,236,0.3); }
+  .footer-legal a { color: rgba(245,242,236,0.3); text-decoration: none; }
+  .footer-legal a:hover { color: rgba(245,242,236,0.6); }
+
+  @media (max-width: 900px) {
+    .container, .container-wide, .nav-inner, .hero-content, .archive-grid { padding-left: 24px; padding-right: 24px; }
+    .intro-grid, .map-grid, .why-grid, .approach-grid, .contact-grid { grid-template-columns: 1fr; }
+    .steps-grid { grid-template-columns: 1fr 1fr; }
+    .findings-grid { grid-template-columns: 1fr 1fr; }
+    .archive-grid { grid-template-columns: 1fr 1fr; }
+    .audiences-grid { grid-template-columns: 1fr; }
+    .misc-layout { grid-template-columns: 1fr; }
+    .misc-truths { border-right: none; }
+    .misc-detail-panel { padding: 24px 0 0; }
+    .numbers-grid { grid-template-columns: 1fr 1fr; }
+    .step-editorial { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <button class="nav-logo" onclick="showPage('home')">12 Million Calls Initiative</button>
+    <div class="nav-links">
+      <button class="nav-link" onclick="showPage('response')">Response</button>
+      <button class="nav-link" onclick="showPage('responders')">Responders</button>
+      <button class="nav-link" onclick="showPage('evidence')">Evidence</button>
+      <button class="nav-link" onclick="showPage('about')">About</button>
+      <button class="nav-cta" onclick="showPage('get-involved')">Get Involved</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================================ HOME ============================================================ -->
+<div id="page-home" class="page active">
+
+  <section class="hero">
+    <div class="hero-texture"></div>
+    <div class="hero-accent-line"></div>
+    <div class="hero-content">
+      <div class="hero-eyebrow">Safe First Response</div>
+      <h1 class="hero-headline">Police receive over 240 million<br><em>911 calls</em> each year.</h1>
+      <p class="hero-sub">What if even a small share were routed to responders trained to meet people's actual needs?</p>
+      <button class="btn btn-primary" onclick="showPage('response')">Explore Response</button>
+      <div class="inline-visual-note">
+        <span class="ivn-label">Visual</span>
+        <span class="ivn-text">Ambient video behind text — responders as professionals in real-world settings. Nothing overly literal. References: stillinprison.org, lethergohome.org, beyondthenow.us</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="intro-block">
+    <div class="container">
+      <div class="intro-grid">
+        <div>
+          <span class="section-label">What is Safe First Response?</span>
+          <p class="intro-text">In cities and towns across the country, trained responders are handling 911 calls that do not require police. These unarmed safety responders address concerns involving mental health, substance use, disputes, and welfare checks — resolving issues with care, reducing harm, and improving public safety.</p>
+        </div>
+        <div class="intro-ctas">
+          <div class="intro-cta-item" onclick="showPage('response')">
+            <span class="intro-cta-title">Explore the Response</span>
+            <span class="intro-cta-arrow">→</span>
+          </div>
+          <div class="intro-cta-item" onclick="showPage('responders')">
+            <span class="intro-cta-title">Meet Responders</span>
+            <span class="intro-cta-arrow">→</span>
+          </div>
+          <div class="intro-cta-item" onclick="showPage('evidence')">
+            <span class="intro-cta-title">See the Evidence</span>
+            <span class="intro-cta-arrow">→</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="video-teaser">
+    <div class="container-wide">
+      <span class="section-label">From the archive</span>
+      <h2>Hear directly from the people doing this work —<br>in their own words.</h2>
+      <div class="video-grid-3">
+        <div class="placeholder-video">
+          <div class="placeholder-video-inner">
+            <div class="play-icon"><svg width="16" height="18" viewBox="0 0 18 20"><path d="M0 0l18 10L0 20z"/></svg></div>
+            <span class="placeholder-label">Video Placeholder</span>
+            <span class="placeholder-sublabel">Clinician · Minneapolis, MN</span>
+          </div>
+        </div>
+        <div class="placeholder-video">
+          <div class="placeholder-video-inner">
+            <div class="play-icon"><svg width="16" height="18" viewBox="0 0 18 20"><path d="M0 0l18 10L0 20z"/></svg></div>
+            <span class="placeholder-label">Video Placeholder</span>
+            <span class="placeholder-sublabel">Peer Specialist · Denver, CO</span>
+          </div>
+        </div>
+        <div class="placeholder-video">
+          <div class="placeholder-video-inner">
+            <div class="play-icon"><svg width="16" height="18" viewBox="0 0 18 20"><path d="M0 0l18 10L0 20z"/></svg></div>
+            <span class="placeholder-label">Video Placeholder</span>
+            <span class="placeholder-sublabel">Outreach Specialist · Durham, NC</span>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top: 28px;">
+        <button class="btn btn-outline" onclick="showPage('responders')">View Responders</button>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- MISCONCEPTIONS ACCORDION -->
+  <section class="misconceptions">
+    <div class="container">
+      <span class="section-label">Common questions, plain answers</span>
+      <h2>Addressing the doubts</h2>
+      <div class="misc-layout">
+        <div class="misc-truths" id="misc-truths">
+          <div class="misc-truth-item active" data-index="0">
+            <div class="misc-truth-text">Unarmed response dramatically reduces escalation</div>
+          </div>
+          <div class="misc-truth-item" data-index="1">
+            <div class="misc-truth-text">Responders are trained professionals</div>
+          </div>
+          <div class="misc-truth-item" data-index="2">
+            <div class="misc-truth-text">Safe First Response saves public dollars</div>
+          </div>
+          <div class="misc-truth-item" data-index="3">
+            <div class="misc-truth-text">These models work in cities and rural communities</div>
+          </div>
+          <div class="misc-truth-item" data-index="4">
+            <div class="misc-truth-text">This strengthens — not weakens — public safety</div>
+          </div>
+        </div>
+        <div class="misc-detail-panel">
+          <div class="misc-detail-inner">
+            <div class="misc-detail active" data-index="0">
+              <span class="misc-detail-label">On Safety</span>
+              <h3>Unarmed response dramatically reduces escalation</h3>
+              <p>Across programs nationwide, unarmed responders resolve the vast majority of calls without force, arrest, or injury. By arriving without weapons and prioritizing communication, de-escalation, and clinical assessment, responders reduce fear and volatility at the outset of an interaction. This approach lowers the risk of harm for community members, responders, and law enforcement alike — and helps prevent situations from escalating into crises that require police involvement.</p>
+            </div>
+            <div class="misc-detail" data-index="1">
+              <span class="misc-detail-label">On Professionalism</span>
+              <h3>Responders are trained professionals</h3>
+              <p>AFR responders are trained, certified, and dispatched directly from 911. They bring clinical expertise, lived experience, trauma-informed skills, and cultural knowledge. Many programs use marked vehicles and uniforms. When they arrive, people know that help — real, professional help — has come.</p>
+            </div>
+            <div class="misc-detail" data-index="2">
+              <span class="misc-detail-label">On Cost</span>
+              <h3>Safe First Response saves public dollars</h3>
+              <p>The cost per response is significantly lower than a traditional police response to the same type of call. Programs reduce strain on emergency rooms, police departments, and the court system. Studies of programs like Denver's STAR show meaningful cost savings per call — producing measurable returns across the entire public safety ecosystem.</p>
+            </div>
+            <div class="misc-detail" data-index="3">
+              <span class="misc-detail-label">On Universality</span>
+              <h3>These models work in cities and rural communities</h3>
+              <p>Every community faces the same underlying concerns: untreated mental health needs, interpersonal disputes, welfare checks, and more. Programs are already operating in small towns and rural counties. Some use phone or virtual response where rapid in-person response isn't feasible. The model is tailored to local context — the need is universal.</p>
+            </div>
+            <div class="misc-detail" data-index="4">
+              <span class="misc-detail-label">On Public Safety</span>
+              <h3>This strengthens — not weakens — public safety</h3>
+              <p>Safe First Response reduces inappropriate call volume so that police can focus on situations that genuinely require them. Law enforcement officers across the country report that these programs make their jobs easier, safer, and more effective. This isn't a competition. It's a collaboration — a smarter, fuller approach to keeping communities safe.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="map-block">
+    <div class="container">
+      <div class="map-grid">
+        <div>
+          <span class="section-label">National Patterns</span>
+          <h2>What patterns emerge when millions of calls are handled differently?</h2>
+          <p style="margin-top: 18px; margin-bottom: 26px;">Programs are launching across the country — in small towns and major cities. The data shows what's possible when we match response to need.</p>
+          <button class="btn btn-primary" onclick="showPage('evidence')">Explore the Evidence</button>
+        </div>
+        <div>
+          <div class="placeholder-map">
+            <span class="placeholder-label">Interactive Map Placeholder</span>
+            <span class="placeholder-sublabel" style="text-align:center; max-width:32ch;">National AFR program locations — filterable by state and program type.<br><br>Ref: felonymurderreporting.org/#states</span>
+            <div style="display:flex; gap:12px; margin-top:8px;">
+              <div style="font-size:0.68rem; color:var(--accent); border:1px solid var(--accent); padding:4px 10px;">130+ Programs</div>
+              <div style="font-size:0.68rem; color:var(--text-muted); border:1px solid var(--border); padding:4px 10px;">All 50 States</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="news-block">
+    <div class="container-wide">
+      <span class="section-label">In the news</span>
+      <div class="news-track">
+        <div class="news-item"><div class="news-outlet">The New York Times</div><div class="news-headline">"These Cities Are Sending Mental Health Workers, Not Police, to Some 911 Calls"</div><div class="news-date">Placeholder — replace with real coverage</div></div>
+        <div class="news-item"><div class="news-outlet">Washington Post</div><div class="news-headline">"Denver's alternative response program cut costs and kept people out of jail"</div><div class="news-date">Placeholder — replace with real coverage</div></div>
+        <div class="news-item"><div class="news-outlet">NPR</div><div class="news-headline">"Cities Look Beyond Police For Public Safety Solutions That Actually Stick"</div><div class="news-date">Placeholder — replace with real coverage</div></div>
+        <div class="news-item"><div class="news-outlet">Governing</div><div class="news-headline">"What the Evidence Says About Alternative Response"</div><div class="news-date">Placeholder — replace with real coverage</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="about-end">
+    <div class="container">
+      <span class="section-label" style="display:block;text-align:center;">About this project</span>
+      <h2 style="max-width:22ch;margin:0 auto 18px;text-align:center;">This project is led by the Policing Project in partnership with practitioners, researchers, and communities across the country.</h2>
+      <div style="display:flex;gap:14px;justify-content:center;margin-top:32px;">
+        <button class="btn btn-outline" onclick="showPage('about')">About the Project</button>
+        <button class="btn btn-primary" onclick="showPage('get-involved')">Get Involved</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div><span class="footer-logo">12 Million Calls Initiative</span><p class="footer-tagline">A project of the Policing Project at NYU School of Law, in partnership with Zealous and the Joyce Foundation.</p></div>
+        <div><div class="footer-col-title">Navigate</div><div class="footer-links"><button class="footer-link" onclick="showPage('response')">Response</button><button class="footer-link" onclick="showPage('responders')">Responders</button><button class="footer-link" onclick="showPage('evidence')">Evidence</button><button class="footer-link" onclick="showPage('about')">About</button></div></div>
+        <div><div class="footer-col-title">Get Involved</div><div class="footer-links"><button class="footer-link" onclick="showPage('get-involved')">Get Involved</button></div></div>
+        <div><div class="footer-col-title">Contact</div><div class="footer-links"><span class="footer-link">Email (TBD)</span><span class="footer-link">Phone (TBD)</span><span class="footer-link">Address (TBD)</span></div></div>
+      </div>
+      <div class="footer-bottom"><div class="footer-legal"><a href="#">Privacy Policy</a> · <a href="#">Terms of Use</a></div><div class="footer-legal">© 2025 The Policing Project</div></div>
+    </div>
+  </footer>
+</div>
+
+<!-- ============================================================ RESPONSE ============================================================ -->
+<!-- ============================================================ RESPONSE ============================================================ -->
+<style>
+/* ---- STEP IMMERSIVE EXPERIENCE ---- */
+.step-index {
+  border-top: 1px solid var(--border);
+}
+.step-index:last-child { border-bottom: 1px solid var(--border); }
+
+.step-tab {
+  display: flex; align-items: center; gap: 20px;
+  padding: 18px 0; cursor: pointer; user-select: none;
+  transition: padding-left 0.25s;
+}
+.step-tab:hover { padding-left: 6px; }
+.step-index.open .step-tab { padding-left: 0; border-bottom: 1px solid var(--border); }
+
+.step-badge {
+  width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+  border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center;
+  font-size: 0.6rem; font-weight: 700; letter-spacing: 0.05em; color: var(--text-muted);
+  transition: all 0.25s;
+}
+.step-index.open .step-badge { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.step-tab-title { font-family: 'Fraunces', serif; font-size: 1.15rem; font-weight: 400; flex: 1; }
+.step-tab-program { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-dim); margin-left: auto; flex-shrink: 0; }
+.step-tab-toggle { font-size: 1rem; color: var(--text-dim); transition: transform 0.3s, color 0.2s; flex-shrink: 0; margin-left: 16px; }
+.step-index.open .step-tab-toggle { transform: rotate(45deg); color: var(--accent); }
+
+/* Immersive panel */
+.step-panel {
+  max-height: 0; overflow: hidden;
+  transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.step-index.open .step-panel { max-height: 9999px; }
+
+/* BLOCK 1 — Cinematic hero */
+.step-block-hero {
+  background: #111009;
+  position: relative; overflow: hidden;
+  margin: 0 -48px; /* bleeds to edges */
+}
+.step-hero-media {
+  position: relative; height: 480px;
+  display: flex; align-items: flex-end;
+}
+.step-hero-bg {
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, #1a1608 0%, #0f0e09 100%);
+  display: flex; align-items: center; justify-content: center;
+}
+.step-hero-grain {
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity: 0.6;
+}
+.step-hero-gradient {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(17,16,9,0.95) 0%, rgba(17,16,9,0.3) 50%, rgba(17,16,9,0.1) 100%);
+}
+.step-hero-content {
+  position: relative; z-index: 2;
+  padding: 0 64px 48px; width: 100%;
+}
+.step-hero-doc-label {
+  font-size: 0.6rem; font-weight: 700; letter-spacing: 0.28em; text-transform: uppercase;
+  color: rgba(201,169,110,0.7); border: 1px solid rgba(201,169,110,0.25);
+  display: inline-block; padding: 4px 10px; margin-bottom: 16px;
+}
+.step-hero-title {
+  font-family: 'Fraunces', serif; font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 400; color: #f0ede6; line-height: 1.1; margin-bottom: 10px;
+}
+.step-hero-caption {
+  font-size: 0.82rem; color: rgba(240,237,230,0.5); line-height: 1.5; max-width: 52ch;
+}
+/* Play indicator */
+.step-play-ring {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  z-index: 2;
+  width: 80px; height: 80px; border-radius: 50%;
+  border: 1.5px solid rgba(201,169,110,0.4);
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color 0.2s;
+}
+.step-play-ring::after {
+  content: ''; width: 0; height: 0;
+  border-top: 12px solid transparent; border-bottom: 12px solid transparent;
+  border-left: 20px solid rgba(201,169,110,0.6);
+  margin-left: 4px;
+}
+
+/* Narrative below hero */
+.step-narrative {
+  background: var(--surface); padding: 56px 64px;
+  margin: 0 -48px; border-bottom: 1px solid var(--border);
+}
+.step-narrative-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+.step-narrative-label { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; display: block; }
+.step-narrative p { font-size: 0.97rem; line-height: 1.75; }
+
+/* BLOCK 2 — Editorial spread */
+.step-editorial-spread {
+  background: var(--bg); padding: 56px 64px;
+  margin: 0 -48px; border-bottom: 1px solid var(--border);
+}
+.step-spread-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 56px; align-items: start; }
+
+.step-pull-quote {
+  font-family: 'Fraunces', serif; font-size: clamp(1.5rem, 2.5vw, 2rem);
+  font-weight: 300; font-style: italic; line-height: 1.3;
+  color: var(--text); border-left: 3px solid var(--accent); padding-left: 24px;
+  margin-bottom: 28px;
+}
+.step-pull-attribution {
+  font-size: 0.72rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: 24px; padding-left: 27px;
+}
+.step-spread-text p { font-size: 0.93rem; line-height: 1.75; }
+
+/* Photo diptych */
+.step-diptych { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; margin-bottom: 16px; }
+.step-photo {
+  position: relative; overflow: hidden;
+  background: var(--bg2);
+}
+.step-photo::before { content: ''; display: block; padding-top: 140%; }
+.step-photo-inner {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 6px; padding: 16px;
+  text-align: center;
+}
+.step-photo-icon { font-size: 1.2rem; opacity: 0.25; }
+.step-photo-cap { font-size: 0.64rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); line-height: 1.4; }
+
+/* Wide photo variant */
+.step-photo-wide {
+  position: relative; background: var(--bg2); margin-bottom: 3px;
+}
+.step-photo-wide::before { content: ''; display: block; padding-top: 58%; }
+.step-photo-wide .step-photo-inner { position: absolute; }
+
+/* Audio player mockup */
+.step-audio-player {
+  background: var(--surface); border: 1px solid var(--border);
+  padding: 16px 18px; display: flex; flex-direction: column; gap: 10px;
+}
+.step-audio-top { display: flex; align-items: center; gap: 14px; }
+.step-audio-btn {
+  width: 36px; height: 36px; border-radius: 50%; background: var(--accent);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer;
+}
+.step-audio-btn::after {
+  content: ''; width: 0; height: 0;
+  border-top: 7px solid transparent; border-bottom: 7px solid transparent;
+  border-left: 11px solid #fff; margin-left: 2px;
+}
+.step-audio-info {}
+.step-audio-type { font-size: 0.58rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); }
+.step-audio-label { font-size: 0.8rem; color: var(--text); line-height: 1.35; }
+.step-waveform {
+  display: flex; align-items: center; gap: 2px; height: 28px;
+}
+.step-wave-bar {
+  width: 3px; background: var(--border-strong); border-radius: 2px; flex-shrink: 0;
+}
+
+/* BLOCK 3 — Program spotlight + archive */
+.step-archive-block {
+  background: #111009; padding: 56px 64px;
+  margin: 0 -48px; border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.step-archive-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+.step-archive-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.26em; text-transform: uppercase; color: rgba(201,169,110,0.65); }
+
+.step-archive-grid { display: grid; grid-template-columns: 1.8fr 1fr; gap: 20px; }
+
+.step-archive-main {
+  background: #1a1810; border: 1px solid rgba(255,255,255,0.06);
+  position: relative; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  min-height: 260px; flex-direction: column; gap: 14px;
+}
+.step-archive-type { font-size: 0.58rem; font-weight: 700; letter-spacing: 0.25em; text-transform: uppercase; color: rgba(201,169,110,0.5); }
+.step-archive-desc { font-size: 0.8rem; color: rgba(240,237,230,0.35); text-align: center; max-width: 32ch; line-height: 1.5; }
+
+/* Program card */
+.step-program-card {
+  background: #1a1810; border: 1px solid rgba(201,169,110,0.2);
+  border-top: 3px solid var(--accent);
+  padding: 28px 24px; display: flex; flex-direction: column; gap: 14px;
+}
+.step-program-eyebrow { font-size: 0.58rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(201,169,110,0.7); }
+.step-program-name { font-family: 'Fraunces', serif; font-size: 1.2rem; color: #f0ede6; font-weight: 400; line-height: 1.2; }
+.step-program-location { font-size: 0.78rem; color: rgba(240,237,230,0.45); }
+.step-program-stat { font-family: 'Fraunces', serif; font-size: 2.2rem; font-weight: 300; color: var(--accent); line-height: 1; }
+.step-program-stat-label { font-size: 0.72rem; color: rgba(240,237,230,0.4); line-height: 1.4; }
+.step-program-quote { font-size: 0.82rem; font-style: italic; color: rgba(240,237,230,0.6); line-height: 1.6; border-top: 1px solid rgba(255,255,255,0.07); padding-top: 14px; }
+
+/* Continue CTA */
+.step-continue {
+  background: var(--bg2); padding: 40px 64px;
+  margin: 0 -48px; display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 3px solid var(--border);
+}
+.step-continue-left {}
+.step-continue-meta { font-size: 0.62rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 6px; }
+.step-continue-label { font-family: 'Fraunces', serif; font-size: 1.4rem; color: var(--text); }
+.step-continue-btn {
+  font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+  background: var(--text); color: var(--bg); padding: 14px 32px; border: none; cursor: pointer;
+  transition: background 0.2s; white-space: nowrap; flex-shrink: 0;
+}
+.step-continue-btn:hover { background: var(--accent); }
+
+/* Waveform bars random heights */
+.step-waveform .step-wave-bar:nth-child(1){height:40%} .step-waveform .step-wave-bar:nth-child(2){height:70%}
+.step-waveform .step-wave-bar:nth-child(3){height:55%} .step-waveform .step-wave-bar:nth-child(4){height:90%}
+.step-waveform .step-wave-bar:nth-child(5){height:45%} .step-waveform .step-wave-bar:nth-child(6){height:75%}
+.step-waveform .step-wave-bar:nth-child(7){height:60%} .step-waveform .step-wave-bar:nth-child(8){height:85%}
+.step-waveform .step-wave-bar:nth-child(9){height:50%} .step-waveform .step-wave-bar:nth-child(10){height:95%}
+.step-waveform .step-wave-bar:nth-child(11){height:40%} .step-waveform .step-wave-bar:nth-child(12){height:65%}
+.step-waveform .step-wave-bar:nth-child(13){height:80%} .step-waveform .step-wave-bar:nth-child(14){height:55%}
+.step-waveform .step-wave-bar:nth-child(15){height:70%} .step-waveform .step-wave-bar:nth-child(16){height:45%}
+.step-waveform .step-wave-bar:nth-child(17){height:85%} .step-waveform .step-wave-bar:nth-child(18){height:60%}
+.step-waveform .step-wave-bar:nth-child(19){height:40%} .step-waveform .step-wave-bar:nth-child(20){height:75%}
+.step-waveform .step-wave-bar:nth-child(21){height:50%} .step-waveform .step-wave-bar:nth-child(22){height:90%}
+.step-waveform .step-wave-bar:nth-child(23){height:65%} .step-waveform .step-wave-bar:nth-child(24){height:40%}
+.step-waveform .step-wave-bar:nth-child(25){height:78%} .step-waveform .step-wave-bar:nth-child(26){height:52%}
+.step-waveform .step-wave-bar:nth-child(27){height:88%} .step-waveform .step-wave-bar:nth-child(28){height:63%}
+.step-waveform .step-wave-bar:nth-child(29){height:44%} .step-waveform .step-wave-bar:nth-child(30){height:70%}
+.step-waveform .step-wave-bar:nth-child(31){height:55%} .step-waveform .step-wave-bar:nth-child(32){height:82%}
+.step-waveform .step-wave-bar:nth-child(n+17) { background: rgba(181,135,60,0.3); }
+</style>
+
+<div id="page-response" class="page">
+  <section class="response-hero">
+    <div class="container">
+      <span class="section-label">How it works</span>
+      <h1>How Safe First Response Works</h1>
+      <p style="margin-top:18px;font-size:1.1rem;max-width:60ch;line-height:1.7;color:rgba(26,23,16,0.65);">When someone needs help, what happens next matters enormously. Safe First Response is built on a simple idea: get the right person to every call, with the right skills, for the right outcome. Here's what that looks like — from the first 911 call to the last follow-up.</p>
+    </div>
+  </section>
+
+  <div class="sticky-nav" id="resp-sticky-nav">
+    <div class="sticky-nav-inner">
+      <button class="sticky-nav-btn active" data-target="rcomp1">Pre-Response Diversion</button>
+      <button class="sticky-nav-btn" data-target="rcomp2">In-Person Response</button>
+      <button class="sticky-nav-btn" data-target="rcomp3">Alternate Destinations</button>
+      <button class="sticky-nav-btn" data-target="rcomp4">Second Response</button>
+    </div>
+  </div>
+
+  <!-- COMPONENT 1 -->
+  <section class="response-component" id="rcomp1">
+    <div class="container">
+      <div class="component-header">
+        <div class="component-number">01</div>
+        <div>
+          <span class="section-label">Before anyone is dispatched</span>
+          <h2>Pre-Response Diversion</h2>
+          <h3 style="margin-top:10px;color:var(--text-muted);">Many concerns can be resolved before a responder ever leaves the station.</h3>
+        </div>
+      </div>
+      <p>Not every call to 911 needs an in-person response. A well-designed system can resolve many concerns immediately — by phone, online, or through triage.</p>
+      <div class="diversion-list">
+        <div class="diversion-item"><div class="diversion-dot"></div><div class="diversion-body"><strong>Online reporting</strong> for non-urgent concerns — noise, minor incidents, follow-ups.</div></div>
+        <div class="diversion-item"><div class="diversion-dot"></div><div class="diversion-body"><strong>Emergency clinical support over the phone</strong> for people in distress.</div></div>
+        <div class="diversion-item"><div class="diversion-dot"></div><div class="diversion-body"><strong>Mandatory alarm verification</strong> before anyone is dispatched.</div></div>
+        <div class="diversion-item"><div class="diversion-dot"></div><div class="diversion-body"><strong>Medical director oversight</strong> for mental health and substance use triage.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPONENT 2 — IMMERSIVE 7 STEPS -->
+  <section class="response-component" id="rcomp2" style="padding-bottom:0;">
+    <div class="container">
+      <div class="component-header">
+        <div class="component-number">02</div>
+        <div>
+          <span class="section-label">The right responder arrives</span>
+          <h2>In-Person Response</h2>
+          <h3 style="margin-top:10px;color:var(--text-muted);">Seven stages. Each one a window into what trained, unarmed response looks like in practice. Click any stage to go deeper.</h3>
+        </div>
+      </div>
+    </div>
+
+    <div class="container" id="steps-container">
+
+      <!-- ===== STEP 1 ===== -->
+      <div class="step-index" data-step="0">
+        <div class="step-tab">
+          <div class="step-badge">01</div>
+          <div class="step-tab-title">A concern, not a crime</div>
+          <div class="step-tab-program">CAHOOTS · Eugene, OR</div>
+          <span class="step-tab-toggle">+</span>
+        </div>
+        <div class="step-panel">
+
+          <!-- BLOCK 1: CINEMATIC HERO -->
+          <div class="step-block-hero">
+            <div class="step-hero-media">
+              <div class="step-hero-bg">
+                <div style="font-size:5rem;opacity:0.04;color:#f0ede6;font-family:'Fraunces',serif;">911</div>
+              </div>
+              <div class="step-hero-grain"></div>
+              <div class="step-hero-gradient"></div>
+              <div class="step-play-ring"></div>
+              <div class="step-hero-content">
+                <span class="step-hero-doc-label">Documentary Footage · Placeholder</span>
+                <h2 class="step-hero-title">A concern, not a crime</h2>
+                <p class="step-hero-caption">Someone needs help. Before anything else can go right, this distinction has to be made — by the dispatcher, the responder, and the system itself.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- BLOCK 1 NARRATIVE -->
+          <div class="step-narrative">
+            <div class="step-narrative-grid">
+              <div>
+                <span class="step-narrative-label">Setting the scene</span>
+                <p>Across America, 240 million calls flow into 911 every year. A significant share — mental health welfare checks, disputes between neighbors, people in distress on the street — don't require a police response. They require a human one.</p>
+                <p>The moment a call is classified as a concern rather than a crime, everything changes. The triage process, the dispatch decision, the person who shows up at the door — all of it turns on this first, critical frame.</p>
+              </div>
+              <div>
+                <span class="step-narrative-label">What research tells us</span>
+                <p>Studies of 911 call logs consistently find that 20–40% of police calls involve no criminal element at all. Mental health, substance use, welfare checks, and conflict resolution together constitute a substantial and measurable fraction of emergency calls — calls that trained, unarmed responders handle more safely and at lower cost.</p>
+                <p>The problem isn't the calls. The problem is the default response.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- BLOCK 2: EDITORIAL SPREAD -->
+          <div class="step-editorial-spread">
+            <div class="step-spread-grid">
+              <div class="step-spread-text">
+                <div class="step-pull-quote">"Most of what we respond to, nobody needed police. They needed somebody."</div>
+                <div class="step-pull-attribution">— CAHOOTS Responder, Eugene, OR</div>
+                <p>CAHOOTS — Crisis Assistance Helping Out On The Streets — has been operating in Eugene, Oregon since 1989. In more than three decades, their mobile crisis intervention teams have handled over 17% of Eugene's 911 call volume. They go without police to calls involving mental health concerns, welfare checks, intoxicated individuals, and more.</p>
+                <p>Their insight — that most calls simply don't require an armed response — is now backed by national data, replicated across dozens of cities, and supported by law enforcement partners who see firsthand what it looks like when the right responder shows up.</p>
+              </div>
+              <div>
+                <div class="step-diptych">
+                  <div class="step-photo">
+                    <div class="step-photo-inner">
+                      <div class="step-photo-icon">📷</div>
+                      <div class="step-photo-cap">Responder in vehicle, preparing for shift</div>
+                    </div>
+                  </div>
+                  <div class="step-photo">
+                    <div class="step-photo-inner">
+                      <div class="step-photo-icon">📷</div>
+                      <div class="step-photo-cap">Dispatch center — call triage in progress</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="step-audio-player">
+                  <div class="step-audio-top">
+                    <div class="step-audio-btn"></div>
+                    <div class="step-audio-info">
+                      <div class="step-audio-type">Field Audio · Placeholder</div>
+                      <div class="step-audio-label">Dispatcher describes the call routing decision</div>
+                    </div>
+                  </div>
+                  <div class="step-waveform">
+                    <div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div>
+                    <div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div>
+                    <div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div>
+                    <div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div>
+                    <div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div>
+                    <div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div>
+                    <div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div>
+                    <div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div>
+                    <div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div>
+                    <div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div>
+                    <div class="step-wave-bar"></div><div class="step-wave-bar"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- BLOCK 3: ARCHIVE + PROGRAM CARD -->
+          <div class="step-archive-block">
+            <div class="step-archive-header">
+              <span class="step-archive-label">Program Feature · CAHOOTS · Eugene, OR</span>
+              <span class="step-archive-label">Founded 1989</span>
+            </div>
+            <div class="step-archive-grid">
+              <div class="step-archive-main">
+                <span class="step-archive-type">Data Visualization · Placeholder</span>
+                <div class="step-archive-desc">Call volume breakdown: police vs. AFR-appropriate calls in Eugene, 2023. Source: CAHOOTS annual data.</div>
+              </div>
+              <div class="step-program-card">
+                <div class="step-program-eyebrow">Program Feature</div>
+                <div class="step-program-name">CAHOOTS</div>
+                <div class="step-program-location">White Bird Clinic · Eugene, Oregon</div>
+                <div style="height:1px;background:rgba(255,255,255,0.07);"></div>
+                <div>
+                  <div class="step-program-stat">17%</div>
+                  <div class="step-program-stat-label">of Eugene's 911 call volume handled without police</div>
+                </div>
+                <div class="step-program-quote">"We go to the people who are in the most need, in the most vulnerable moments of their lives."</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-continue" data-next="1">
+            <div class="step-continue-left">
+              <div class="step-continue-meta">Next: Stage 02</div>
+              <div class="step-continue-label">Triage at 911</div>
+            </div>
+            <button class="step-continue-btn" data-next="1">Continue →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== STEP 2 ===== -->
+      <div class="step-index" data-step="1">
+        <div class="step-tab">
+          <div class="step-badge">02</div>
+          <div class="step-tab-title">Triage at 911</div>
+          <div class="step-tab-program">STAR · Denver, CO</div>
+          <span class="step-tab-toggle">+</span>
+        </div>
+        <div class="step-panel">
+          <div class="step-block-hero">
+            <div class="step-hero-media">
+              <div class="step-hero-bg">
+                <div style="font-size:4rem;opacity:0.05;color:#f0ede6;letter-spacing:0.4em;font-weight:300;">DISPATCH</div>
+              </div>
+              <div class="step-hero-grain"></div>
+              <div class="step-hero-gradient"></div>
+              <div class="step-play-ring"></div>
+              <div class="step-hero-content">
+                <span class="step-hero-doc-label">Documentary Footage · Placeholder</span>
+                <h2 class="step-hero-title">Triage at 911</h2>
+                <p class="step-hero-caption">The dispatcher's decision — made in seconds — determines who arrives. It is the invisible architecture of the entire system.</p>
+              </div>
+            </div>
+          </div>
+          <div class="step-narrative">
+            <div class="step-narrative-grid">
+              <div>
+                <span class="step-narrative-label">The protocol</span>
+                <p>When a call comes in, a trained dispatcher runs through a rapid assessment: Is anyone harmed? Is a weapon present? Does this situation require someone with law enforcement authority — or someone with clinical and de-escalation skills?</p>
+                <p>When the answer is the latter — and it often is — an AFR responder is dispatched directly from 911. The caller hears: "Help is on the way." They don't always know who's coming. But the right person is.</p>
+              </div>
+              <div>
+                <span class="step-narrative-label">Designing the system</span>
+                <p>In Denver, STAR — Support Team Assisted Response — developed its triage protocol in partnership with 911 dispatch, the police department, and mental health clinicians. The protocol was tested, refined, and operationalized over months before a single call was routed.</p>
+                <p>That groundwork is what allows a dispatcher to make the call in real time, with confidence — knowing the team they're sending is equipped for exactly this.</p>
+              </div>
+            </div>
+          </div>
+          <div class="step-editorial-spread">
+            <div class="step-spread-grid">
+              <div class="step-spread-text">
+                <div class="step-pull-quote">"We trained side by side with dispatch. They know us, they trust us. That trust is the whole system."</div>
+                <div class="step-pull-attribution">— STAR Program Coordinator, Denver, CO</div>
+                <p>The triage protocol isn't just a checklist — it's a relationship. Dispatchers who work alongside AFR teams develop pattern recognition over time, gaining comfort and confidence in routing calls away from police. Programs that invest in this relationship see smoother, faster, more accurate routing.</p>
+                <p>Denver's STAR program handles thousands of calls per year, all routed through 911 dispatch. Zero police backup has ever been needed on a STAR call due to safety concerns.</p>
+              </div>
+              <div>
+                <div class="step-photo-wide">
+                  <div class="step-photo-inner">
+                    <div class="step-photo-icon">📷</div>
+                    <div class="step-photo-cap">911 dispatch center — wide establishing shot</div>
+                  </div>
+                </div>
+                <div class="step-diptych" style="gap:3px;margin-top:3px;">
+                  <div class="step-photo" style="min-height:120px;">
+                    <div class="step-photo-inner">
+                      <div class="step-photo-icon">📷</div>
+                      <div class="step-photo-cap">Dispatcher at console</div>
+                    </div>
+                  </div>
+                  <div class="step-photo" style="min-height:120px;">
+                    <div class="step-photo-inner">
+                      <div class="step-photo-icon">📷</div>
+                      <div class="step-photo-cap">Protocol flowchart / training doc</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="step-archive-block">
+            <div class="step-archive-header">
+              <span class="step-archive-label">Program Feature · STAR · Denver, CO</span>
+              <span class="step-archive-label">Launched 2020</span>
+            </div>
+            <div class="step-archive-grid">
+              <div class="step-archive-main">
+                <span class="step-archive-type">Archival Document · Placeholder</span>
+                <div class="step-archive-desc">STAR call triage protocol document — decision tree from initial 911 intake to responder dispatch. Denver Department of Public Health.</div>
+              </div>
+              <div class="step-program-card">
+                <div class="step-program-eyebrow">Program Feature</div>
+                <div class="step-program-name">STAR Program</div>
+                <div class="step-program-location">Denver Dept. of Public Health · Denver, Colorado</div>
+                <div style="height:1px;background:rgba(255,255,255,0.07);"></div>
+                <div>
+                  <div class="step-program-stat">0</div>
+                  <div class="step-program-stat-label">Police backup calls required on 2,400+ STAR responses</div>
+                </div>
+                <div class="step-program-quote">"The dispatcher's confidence is the foundation. Without it, nothing else works."</div>
+              </div>
+            </div>
+          </div>
+          <div class="step-continue" data-next="2">
+            <div class="step-continue-left">
+              <div class="step-continue-meta">Next: Stage 03</div>
+              <div class="step-continue-label">Initial assessment on arrival</div>
+            </div>
+            <button class="step-continue-btn" data-next="2">Continue →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== STEP 3 ===== -->
+      <div class="step-index" data-step="2">
+        <div class="step-tab">
+          <div class="step-badge">03</div>
+          <div class="step-tab-title">Initial assessment on arrival</div>
+          <div class="step-tab-program">HEART · Durham, NC</div>
+          <span class="step-tab-toggle">+</span>
+        </div>
+        <div class="step-panel">
+          <div class="step-block-hero">
+            <div class="step-hero-media">
+              <div class="step-hero-bg">
+                <div style="position:absolute;inset:0;background:linear-gradient(135deg,#0f1209 0%,#101008 100%);"></div>
+              </div>
+              <div class="step-hero-grain"></div>
+              <div class="step-hero-gradient"></div>
+              <div class="step-play-ring"></div>
+              <div class="step-hero-content">
+                <span class="step-hero-doc-label">Field Documentary · Placeholder</span>
+                <h2 class="step-hero-title">The first two minutes</h2>
+                <p class="step-hero-caption">The responder reads the scene before they've said a word. Everything that comes next depends on what they see — and how they choose to enter.</p>
+              </div>
+            </div>
+          </div>
+          <div class="step-narrative">
+            <div class="step-narrative-grid">
+              <div>
+                <span class="step-narrative-label">What the responder sees</span>
+                <p>The van pulls up slowly. The responder steps out without urgency, without tactical gear, without a weapon on their hip. Their uniform communicates care, not force. Before they've said anything, their arrival signals: this is not a confrontation.</p>
+                <p>They scan the environment — looking for safety information, emotional cues, context clues about what happened and who is involved. In two minutes of careful observation, an experienced responder builds a working picture of the entire situation.</p>
+              </div>
+              <div>
+                <span class="step-narrative-label">The science of first contact</span>
+                <p>Research on crisis response consistently shows that the first moments of contact are the highest-leverage point in any interaction. The emotional state of the person in distress will often mirror the energy of the responder who arrives. Calm, slow, non-threatening entry produces measurably better outcomes — faster de-escalation, greater cooperation, less fear.</p>
+                <p>AFR responders are trained to understand this — and to use it.</p>
+              </div>
+            </div>
+          </div>
+          <div class="step-editorial-spread">
+            <div class="step-spread-grid">
+              <div class="step-spread-text">
+                <div class="step-pull-quote">"I park half a block away sometimes. I want them to see me coming. I want them to see that I'm not rushing."</div>
+                <div class="step-pull-attribution">— Crisis Responder, HEART Program, Durham, NC</div>
+                <p>Durham's HEART — Holistic Empathetic Assistance Response Team — trains responders in what they call "the slow approach": deliberate, visible, unhurried entry that allows the person in distress to process who is arriving and why.</p>
+                <p>It sounds counterintuitive in an emergency context. But the data from HEART and programs like it shows that slowing down at the front end dramatically speeds up resolution overall — and produces far better outcomes for the people involved.</p>
+              </div>
+              <div>
+                <div class="step-diptych">
+                  <div class="step-photo">
+                    <div class="step-photo-inner">
+                      <div class="step-photo-icon">📷</div>
+                      <div class="step-photo-cap">HEART van pulling up to scene — slow approach</div>
+                    </div>
+                  </div>
+                  <div class="step-photo">
+                    <div class="step-photo-inner">
+                      <div class="step-photo-icon">📷</div>
+                      <div class="step-photo-cap">Responder stepping out of vehicle</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="step-audio-player">
+                  <div class="step-audio-top">
+                    <div class="step-audio-btn"></div>
+                    <div class="step-audio-info">
+                      <div class="step-audio-type">Responder Interview · Placeholder</div>
+                      <div class="step-audio-label">What I look for in the first two minutes</div>
+                    </div>
+                  </div>
+                  <div class="step-waveform">
+                    <div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="step-archive-block">
+            <div class="step-archive-header">
+              <span class="step-archive-label">Program Feature · HEART · Durham, NC</span>
+            </div>
+            <div class="step-archive-grid">
+              <div class="step-archive-main">
+                <span class="step-archive-type">B-Roll Footage · Placeholder</span>
+                <div class="step-archive-desc">HEART team arriving at scene — full sequence, unscripted. Documenting approach protocol from vehicle to initial contact.</div>
+              </div>
+              <div class="step-program-card">
+                <div class="step-program-eyebrow">Program Feature</div>
+                <div class="step-program-name">HEART Program</div>
+                <div class="step-program-location">City of Durham · Durham, North Carolina</div>
+                <div style="height:1px;background:rgba(255,255,255,0.07);"></div>
+                <div>
+                  <div class="step-program-stat">96%</div>
+                  <div class="step-program-stat-label">of calls resolved without police assistance — placeholder, verify with program</div>
+                </div>
+                <div class="step-program-quote">"We designed the uniform together. Everything is intentional — from the color to the badge to what we carry."</div>
+              </div>
+            </div>
+          </div>
+          <div class="step-continue" data-next="3">
+            <div class="step-continue-left">
+              <div class="step-continue-meta">Next: Stage 04</div>
+              <div class="step-continue-label">Engagement</div>
+            </div>
+            <button class="step-continue-btn" data-next="3">Continue →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== STEP 4 ===== -->
+      <div class="step-index" data-step="3">
+        <div class="step-tab">
+          <div class="step-badge">04</div>
+          <div class="step-tab-title">Engagement</div>
+          <div class="step-tab-program">CAHOOTS · Eugene, OR</div>
+          <span class="step-tab-toggle">+</span>
+        </div>
+        <div class="step-panel">
+          <div class="step-block-hero">
+            <div class="step-hero-media">
+              <div class="step-hero-bg"><div style="position:absolute;inset:0;background:#0d0e0a;"></div></div>
+              <div class="step-hero-grain"></div>
+              <div class="step-hero-gradient"></div>
+              <div class="step-play-ring"></div>
+              <div class="step-hero-content">
+                <span class="step-hero-doc-label">Documentary Footage · Placeholder</span>
+                <h2 class="step-hero-title">The conversation that changes everything</h2>
+                <p class="step-hero-caption">The responder introduces themselves and begins building rapport. They are not there to establish compliance. They are there to help.</p>
+              </div>
+            </div>
+          </div>
+          <div class="step-narrative">
+            <div class="step-narrative-grid">
+              <div>
+                <span class="step-narrative-label">What engagement looks like</span>
+                <p>The first words matter. Responders are trained to introduce themselves clearly, use a calm and even voice, maintain open body language, and — critically — to ask rather than tell. "What's going on?" rather than "What happened." "How are you feeling?" rather than "Calm down."</p>
+                <p>These aren't just soft skills. They are the difference between a conversation that opens and one that closes down. Between a situation that resolves and one that escalates.</p>
+              </div>
+              <div>
+                <span class="step-narrative-label">Trust as infrastructure</span>
+                <p>In communities where police responses have historically been traumatic, the arrival of an AFR responder signals something different. Over time, repeat callers learn who to expect — and what to expect from them. That accumulated trust becomes a resource that the entire system draws on.</p>
+                <p>Engagement isn't just what happens on this call. It is the deposit in a relationship that pays dividends on the next one.</p>
+              </div>
+            </div>
+          </div>
+          <div class="step-editorial-spread">
+            <div class="step-spread-grid">
+              <div class="step-spread-text">
+                <div class="step-pull-quote">"I just sit with them. Sometimes for a long time. That's the work."</div>
+                <div class="step-pull-attribution">— Peer Specialist, CAHOOTS, Eugene, OR</div>
+                <p>Peer specialists bring something no clinical credential can fully replicate: lived experience. When a responder can say, genuinely, "I've been where you are" — the dynamic of the conversation changes. Trust forms faster. People open up more. The engagement is real.</p>
+                <p>CAHOOTS teams typically pair a crisis worker with a medic or counselor. The combination — clinical skill plus human relatability — is a model that many newer programs have adopted and refined.</p>
+              </div>
+              <div>
+                <div class="step-diptych">
+                  <div class="step-photo">
+                    <div class="step-photo-inner"><div class="step-photo-icon">📷</div><div class="step-photo-cap">Responder in conversation with community member — natural, unposed</div></div>
+                  </div>
+                  <div class="step-photo">
+                    <div class="step-photo-inner"><div class="step-photo-icon">📷</div><div class="step-photo-cap">Peer specialist listening — hands open, body language open</div></div>
+                  </div>
+                </div>
+                <div class="step-audio-player">
+                  <div class="step-audio-top">
+                    <div class="step-audio-btn"></div>
+                    <div class="step-audio-info">
+                      <div class="step-audio-type">Community Voice · Placeholder</div>
+                      <div class="step-audio-label">"When they came, I felt like someone actually showed up for me."</div>
+                    </div>
+                  </div>
+                  <div class="step-waveform">
+                    <div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="step-archive-block">
+            <div class="step-archive-header"><span class="step-archive-label">Program Feature · CAHOOTS · Eugene, OR</span></div>
+            <div class="step-archive-grid">
+              <div class="step-archive-main">
+                <span class="step-archive-type">Photo Essay · Placeholder</span>
+                <div class="step-archive-desc">Documentary photo sequence: CAHOOTS team in community. Natural, candid, relationship-centered imagery. Photographer TBD.</div>
+              </div>
+              <div class="step-program-card">
+                <div class="step-program-eyebrow">Program Feature</div>
+                <div class="step-program-name">CAHOOTS</div>
+                <div class="step-program-location">White Bird Clinic · Eugene, Oregon</div>
+                <div style="height:1px;background:rgba(255,255,255,0.07);"></div>
+                <div>
+                  <div class="step-program-stat">34yrs</div>
+                  <div class="step-program-stat-label">of community-based crisis response — the longest-running program in the US</div>
+                </div>
+                <div class="step-program-quote">"The community knows us now. When people see the van, they wave."</div>
+              </div>
+            </div>
+          </div>
+          <div class="step-continue" data-next="4">
+            <div class="step-continue-left">
+              <div class="step-continue-meta">Next: Stage 05</div>
+              <div class="step-continue-label">De-escalation</div>
+            </div>
+            <button class="step-continue-btn" data-next="4">Continue →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== STEP 5 ===== -->
+      <div class="step-index" data-step="4">
+        <div class="step-tab">
+          <div class="step-badge">05</div>
+          <div class="step-tab-title">De-escalation</div>
+          <div class="step-tab-program">ECCO · Austin, TX</div>
+          <span class="step-tab-toggle">+</span>
+        </div>
+        <div class="step-panel">
+          <div class="step-block-hero">
+            <div class="step-hero-media">
+              <div class="step-hero-bg"><div style="position:absolute;inset:0;background:#0a0c09;"></div></div>
+              <div class="step-hero-grain"></div>
+              <div class="step-hero-gradient"></div>
+              <div class="step-play-ring"></div>
+              <div class="step-hero-content">
+                <span class="step-hero-doc-label">Training Documentary · Placeholder</span>
+                <h2 class="step-hero-title">De-escalation is a clinical skill</h2>
+                <p class="step-hero-caption">Not a personality trait. Not a soft skill. A trained, validated methodology with measurable outcomes. This is what AFR responders do.</p>
+              </div>
+            </div>
+          </div>
+          <div class="step-narrative">
+            <div class="step-narrative-grid">
+              <div>
+                <span class="step-narrative-label">What de-escalation actually is</span>
+                <p>De-escalation is a set of evidence-based verbal and behavioral techniques designed to reduce agitation, fear, and conflict in acute situations. It draws on crisis intervention theory, motivational interviewing, trauma-informed care, and mental health first aid.</p>
+                <p>AFR responders are trained in validated frameworks — some for dozens of hours before their first call. These aren't soft skills. They are clinical methodologies, tested in research, refined in practice, and applied under real-world pressure every day.</p>
+              </div>
+              <div>
+                <span class="step-narrative-label">The outcomes data</span>
+                <p>Every major study of AFR programs finds the same thing: when trained de-escalation specialists respond to mental health and substance-use calls, the rate of use of force drops to near zero. Arrests are rare. Injuries are rarer.</p>
+                <p>This isn't because AFR calls are easier. It's because the skills work. The same call, the same person, the same level of distress — different responder, dramatically different outcome.</p>
+              </div>
+            </div>
+          </div>
+          <div class="step-editorial-spread">
+            <div class="step-spread-grid">
+              <div class="step-spread-text">
+                <div class="step-pull-quote">"We don't wing it. Every technique I use, I was trained in. I practiced it. I know why it works."</div>
+                <div class="step-pull-attribution">— Crisis Clinician, ECCO Program, Austin, TX</div>
+                <p>Austin's ECCO — Emergency Community Care Outreach — trains crisis clinicians in Collaborative Assessment and Management of Suicidality (CAMS), applied suicide intervention skills, motivational interviewing, and psychosis response. The clinical foundation isn't incidental to the model — it is the model.</p>
+                <p>ECCO clinicians carry no weapons, wear no body armor. Their tools are conversation, empathy, and years of clinical training. On the calls they respond to, those tools are exactly right for the job.</p>
+              </div>
+              <div>
+                <div class="step-photo-wide">
+                  <div class="step-photo-inner">
+                    <div class="step-photo-icon">📷</div>
+                    <div class="step-photo-cap">Training session — role-play scenario, de-escalation in progress</div>
+                  </div>
+                </div>
+                <div class="step-audio-player" style="margin-top:3px;">
+                  <div class="step-audio-top">
+                    <div class="step-audio-btn"></div>
+                    <div class="step-audio-info">
+                      <div class="step-audio-type">Clinical Training Audio · Placeholder</div>
+                      <div class="step-audio-label">De-escalation framework explained — 3 min. excerpt</div>
+                    </div>
+                  </div>
+                  <div class="step-waveform">
+                    <div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="step-archive-block">
+            <div class="step-archive-header"><span class="step-archive-label">Program Feature · ECCO · Austin, TX</span></div>
+            <div class="step-archive-grid">
+              <div class="step-archive-main">
+                <span class="step-archive-type">Data Visualization · Placeholder</span>
+                <div class="step-archive-desc">Use-of-force comparison: police response vs. AFR response for identical call types. Source: ECCO program data + national research review.</div>
+              </div>
+              <div class="step-program-card">
+                <div class="step-program-eyebrow">Program Feature</div>
+                <div class="step-program-name">ECCO</div>
+                <div class="step-program-location">Austin Public Health · Austin, Texas</div>
+                <div style="height:1px;background:rgba(255,255,255,0.07);"></div>
+                <div>
+                  <div class="step-program-stat">0</div>
+                  <div class="step-program-stat-label">Use-of-force incidents across all program responses — placeholder, verify</div>
+                </div>
+                <div class="step-program-quote">"They sent a clinician to a mental health call. And she resolved it. That's the whole argument."</div>
+              </div>
+            </div>
+          </div>
+          <div class="step-continue" data-next="5">
+            <div class="step-continue-left">
+              <div class="step-continue-meta">Next: Stage 06</div>
+              <div class="step-continue-label">Deeper assessment</div>
+            </div>
+            <button class="step-continue-btn" data-next="5">Continue →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== STEP 6 ===== -->
+      <div class="step-index" data-step="5">
+        <div class="step-tab">
+          <div class="step-badge">06</div>
+          <div class="step-tab-title">Deeper assessment</div>
+          <div class="step-tab-program">Safe Streets · Minneapolis, MN</div>
+          <span class="step-tab-toggle">+</span>
+        </div>
+        <div class="step-panel">
+          <div class="step-block-hero">
+            <div class="step-hero-media">
+              <div class="step-hero-bg"><div style="position:absolute;inset:0;background:#0e0d0a;"></div></div>
+              <div class="step-hero-grain"></div>
+              <div class="step-hero-gradient"></div>
+              <div class="step-play-ring"></div>
+              <div class="step-hero-content">
+                <span class="step-hero-doc-label">Field Documentary · Placeholder</span>
+                <h2 class="step-hero-title">What does this person actually need?</h2>
+                <p class="step-hero-caption">Once calm is established, the real work begins: understanding not just what happened, but why — and what it will take to prevent it from happening again.</p>
+              </div>
+            </div>
+          </div>
+          <div class="step-narrative">
+            <div class="step-narrative-grid">
+              <div>
+                <span class="step-narrative-label">Beyond the immediate call</span>
+                <p>A welfare check about an elderly neighbor might reveal unmanaged diabetes, social isolation, and a lapsed prescription. A dispute between roommates might be rooted in housing insecurity and untreated trauma. A person in distress might be navigating a psychotic episode with no case manager, no medication, and no one who knows their name.</p>
+                <p>The responder asks: What does this person actually need right now? And in the longer term? The answers point toward a very different kind of response than a call log can capture.</p>
+              </div>
+              <div>
+                <span class="step-narrative-label">Whole-person assessment</span>
+                <p>AFR responders are trained to conduct rapid whole-person assessments: physical health, mental health, substance use, social support, housing stability, safety concerns. The goal isn't diagnosis — it's a clear enough picture to connect this person to the right resources at the right level of care.</p>
+                <p>This is where the difference between a response and a resolution becomes concrete. The assessment determines what's possible. And what's possible is often more than anyone expected.</p>
+              </div>
+            </div>
+          </div>
+          <div class="step-editorial-spread">
+            <div class="step-spread-grid">
+              <div class="step-spread-text">
+                <div class="step-pull-quote">"The call said welfare check. What I found was a man who hadn't eaten in three days, whose lights had been cut off, and who hadn't talked to anyone in a week. That's not a welfare check. That's a system failing someone."</div>
+                <div class="step-pull-attribution">— Outreach Specialist, Safe Streets, Minneapolis, MN</div>
+                <p>Minneapolis's Safe Streets program places outreach workers with lived experience of housing instability and mental health challenges alongside clinical professionals. The combination allows for both rigorous clinical assessment and the kind of human-level connection that makes people willing to accept help.</p>
+                <p>The assessment phase is often the longest part of a Safe Streets response. That time is the point. It's what makes resolution meaningful — and durable.</p>
+              </div>
+              <div>
+                <div class="step-diptych">
+                  <div class="step-photo">
+                    <div class="step-photo-inner"><div class="step-photo-icon">📷</div><div class="step-photo-cap">Responder writing notes, resource cards spread on table</div></div>
+                  </div>
+                  <div class="step-photo">
+                    <div class="step-photo-inner"><div class="step-photo-icon">📷</div><div class="step-photo-cap">Community member and responder in conversation — eye level</div></div>
+                  </div>
+                </div>
+                <div class="step-audio-player">
+                  <div class="step-audio-top">
+                    <div class="step-audio-btn"></div>
+                    <div class="step-audio-info">
+                      <div class="step-audio-type">Responder Interview · Placeholder</div>
+                      <div class="step-audio-label">The call that changed how I think about this work</div>
+                    </div>
+                  </div>
+                  <div class="step-waveform">
+                    <div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="step-archive-block">
+            <div class="step-archive-header"><span class="step-archive-label">Program Feature · Safe Streets · Minneapolis, MN</span></div>
+            <div class="step-archive-grid">
+              <div class="step-archive-main">
+                <span class="step-archive-type">Photo Essay · Placeholder</span>
+                <div class="step-archive-desc">Documentary sequence: Safe Streets team conducting a community outreach visit. Relationship-centered, natural light, no staging.</div>
+              </div>
+              <div class="step-program-card">
+                <div class="step-program-eyebrow">Program Feature</div>
+                <div class="step-program-name">Safe Streets</div>
+                <div class="step-program-location">City of Minneapolis · Minneapolis, Minnesota</div>
+                <div style="height:1px;background:rgba(255,255,255,0.07);"></div>
+                <div>
+                  <div class="step-program-stat">Pilot</div>
+                  <div class="step-program-stat-label">Launch city for this project · 2024–25</div>
+                </div>
+                <div class="step-program-quote">"We're not just closing the call. We're opening a relationship."</div>
+              </div>
+            </div>
+          </div>
+          <div class="step-continue" data-next="6">
+            <div class="step-continue-left">
+              <div class="step-continue-meta">Next: Stage 07</div>
+              <div class="step-continue-label">Resolution</div>
+            </div>
+            <button class="step-continue-btn" data-next="6">Continue →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== STEP 7 ===== -->
+      <div class="step-index" data-step="6">
+        <div class="step-tab">
+          <div class="step-badge">07</div>
+          <div class="step-tab-title">Resolution</div>
+          <div class="step-tab-program">Multiple Programs</div>
+          <span class="step-tab-toggle">+</span>
+        </div>
+        <div class="step-panel">
+          <div class="step-block-hero">
+            <div class="step-hero-media">
+              <div class="step-hero-bg"><div style="position:absolute;inset:0;background:#0c100a;"></div></div>
+              <div class="step-hero-grain"></div>
+              <div class="step-hero-gradient"></div>
+              <div class="step-play-ring"></div>
+              <div class="step-hero-content">
+                <span class="step-hero-doc-label">Documentary Footage · Placeholder</span>
+                <h2 class="step-hero-title">The concern is addressed.<br>The person is supported.</h2>
+                <p class="step-hero-caption">This is what success looks like. Not a log entry. Not a cleared call. A person who received the help they needed — from the right person, at the right time.</p>
+              </div>
+            </div>
+          </div>
+          <div class="step-narrative">
+            <div class="step-narrative-grid">
+              <div>
+                <span class="step-narrative-label">What resolution means</span>
+                <p>Resolution doesn't mean the same thing on every call. Sometimes it's a conversation that ends with both parties laughing and shaking hands. Sometimes it's arranging a ride to a crisis stabilization center and sitting with someone until they're ready to go. Sometimes it's connecting a person to a case manager who changes the arc of their life over the following year.</p>
+                <p>What resolution always means: the immediate concern is addressed, the person is supported, and the call is closed with care — not with a log entry and a cleared radio.</p>
+              </div>
+              <div>
+                <span class="step-narrative-label">The evidence on outcomes</span>
+                <p>National data on AFR programs consistently shows high on-scene resolution rates — often 85–95% of calls resolved without referral, transport, or police involvement. But the number that matters most is harder to measure: how many people, after a Safe First Response, called 911 less, accessed services more, and felt — for perhaps the first time — that the system showed up for them.</p>
+                <p>That story is why this archive exists.</p>
+              </div>
+            </div>
+          </div>
+          <div class="step-editorial-spread">
+            <div class="step-spread-grid">
+              <div class="step-spread-text">
+                <div class="step-pull-quote">"The call is closed, but I still think about him. I followed up. He got housed. That's why I do this work."</div>
+                <div class="step-pull-attribution">— Crisis Responder, STAR Program, Denver, CO</div>
+                <p>Across every program featured in this archive, responders describe the same experience: the call that stayed with them. The one where the outcome wasn't just resolution — it was transformation. A person who became a neighbor again. A family that stabilized. A moment of genuine human connection in the middle of a crisis.</p>
+                <p>These stories are the evidence that numbers alone cannot carry. They are the reason this archive exists, and the reason Safe First Response must scale.</p>
+              </div>
+              <div>
+                <div class="step-diptych">
+                  <div class="step-photo">
+                    <div class="step-photo-inner"><div class="step-photo-icon">📷</div><div class="step-photo-cap">Responder wrapping up — leaving scene, closing notes</div></div>
+                  </div>
+                  <div class="step-photo">
+                    <div class="step-photo-inner"><div class="step-photo-icon">📷</div><div class="step-photo-cap">End-of-shift debrief — team gathered, natural setting</div></div>
+                  </div>
+                </div>
+                <div class="step-audio-player">
+                  <div class="step-audio-top">
+                    <div class="step-audio-btn"></div>
+                    <div class="step-audio-info">
+                      <div class="step-audio-type">Responder Story · Placeholder</div>
+                      <div class="step-audio-label">The call that proved this works — 5 min.</div>
+                    </div>
+                  </div>
+                  <div class="step-waveform">
+                    <div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div><div class="step-wave-bar"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="step-archive-block">
+            <div class="step-archive-header"><span class="step-archive-label">Cross-Program Evidence · National AFR Data</span></div>
+            <div class="step-archive-grid">
+              <div class="step-archive-main">
+                <span class="step-archive-type">Data Visualization · Placeholder</span>
+                <div class="step-archive-desc">Resolution rates by program type and call category. National AFR program outcomes — 2020–2024. Source: Policing Project national review.</div>
+              </div>
+              <div class="step-program-card">
+                <div class="step-program-eyebrow">Across the Archive</div>
+                <div class="step-program-name">130+ Programs. One Outcome.</div>
+                <div class="step-program-location">Nationwide · 2020–2024</div>
+                <div style="height:1px;background:rgba(255,255,255,0.07);"></div>
+                <div>
+                  <div class="step-program-stat">85–95%</div>
+                  <div class="step-program-stat-label">On-scene resolution rate across leading programs — verify with Policing Project</div>
+                </div>
+                <div class="step-program-quote">"Right responder. Right skillset. Right outcome."</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- FINAL STEP — no "continue", goes to next section -->
+          <div class="step-continue" style="background:var(--text);">
+            <div class="step-continue-left">
+              <div class="step-continue-meta" style="color:rgba(245,242,236,0.4);">You've seen all seven stages</div>
+              <div class="step-continue-label" style="color:#f0ede6;">Now meet the people who make it happen</div>
+            </div>
+            <button class="step-continue-btn" style="background:var(--accent);" onclick="showPage('responders')">Meet the Responders →</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /steps-container -->
+  </section>
+
+  <!-- COMPONENT 3 -->
+  <section class="response-component" id="rcomp3" style="background:var(--bg);padding-top:80px;">
+    <div class="container">
+      <div class="component-header">
+        <div class="component-number">03</div>
+        <div>
+          <span class="section-label">The right place, not just the nearest one</span>
+          <h2>Alternate Destinations</h2>
+          <h3 style="margin-top:10px;color:var(--text-muted);">When someone needs more than on-scene support — there's somewhere to take them, other than an ER or a jail cell.</h3>
+        </div>
+      </div>
+      <div class="destinations-grid">
+        <div class="dest-card"><div class="dest-title">Crisis Stabilization Centers</div><div class="dest-body">Short-term mental health support without involuntary commitment.</div></div>
+        <div class="dest-card"><div class="dest-title">Sobering Centers</div><div class="dest-body">Safe, supervised spaces for intoxication — diverting from ERs and jails.</div></div>
+        <div class="dest-card"><div class="dest-title">Triage Hubs</div><div class="dest-body">Assessment centers connecting people to the right level of care.</div></div>
+        <div class="dest-card"><div class="dest-title">Psychiatric Urgent Care</div><div class="dest-body">Same-day mental health care without emergency room wait times.</div></div>
+        <div class="dest-card"><div class="dest-title">Youth Drop-In Centers</div><div class="dest-body">Safe spaces for young people in crisis.</div></div>
+        <div class="dest-card"><div class="dest-title">Community Providers</div><div class="dest-body">Mental health, substance use, and social service organizations.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPONENT 4 -->
+  <section class="response-component" id="rcomp4" style="border-bottom:none;">
+    <div class="container">
+      <div class="component-header">
+        <div class="component-number">04</div>
+        <div>
+          <span class="section-label">The work doesn't end when the responder leaves</span>
+          <h2>Second Response</h2>
+          <h3 style="margin-top:10px;color:var(--text-muted);">The most effective programs follow up. That's what turns a single response into lasting resolution.</h3>
+        </div>
+      </div>
+      <div class="diversion-list">
+        <div class="diversion-item"><div class="diversion-dot"></div><div class="diversion-body">Prevent future concerns and <strong>reduce repeat 911 calls</strong></div></div>
+        <div class="diversion-item"><div class="diversion-dot"></div><div class="diversion-body">Build <strong>lasting trust</strong> between responders and communities</div></div>
+        <div class="diversion-item"><div class="diversion-dot"></div><div class="diversion-body">Improve the <strong>accuracy and effectiveness</strong> of the system over time</div></div>
+        <div class="diversion-item"><div class="diversion-dot"></div><div class="diversion-body">Turn a one-time response into <strong>genuine, long-term support</strong></div></div>
+      </div>
+      <div style="margin-top:48px;display:flex;gap:14px;">
+        <button class="btn btn-primary" onclick="showPage('responders')">Meet the Responders</button>
+        <button class="btn btn-outline" onclick="showPage('evidence')">See the Evidence</button>
+      </div>
+    </div>
+  </section>
+
+  <footer><div class="footer-inner"><div class="footer-bottom" style="padding:24px 0;"><div class="footer-legal"><a href="#">Privacy</a> · <a href="#">Terms</a></div><button class="footer-link" onclick="showPage('home')">← Home</button></div></div></footer>
+
+  <script>
+  // STEP ACCORDION — immersive open/close
+  document.querySelectorAll('#page-response .step-index .step-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      const row = this.closest('.step-index');
+      const wasOpen = row.classList.contains('open');
+      document.querySelectorAll('#page-response .step-index').forEach(r => r.classList.remove('open'));
+      if (!wasOpen) {
+        row.classList.add('open');
+        // Scroll so the step header is just below sticky navs
+        setTimeout(() => {
+          const top = row.getBoundingClientRect().top + window.scrollY - 130;
+          window.scrollTo({ top, behavior: 'smooth' });
+        }, 50);
+      }
+    });
+  });
+
+  // CONTINUE BUTTONS
+  document.querySelectorAll('.step-continue-btn[data-next]').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const nextIdx = parseInt(this.dataset.next);
+      const nextRow = document.querySelector(`.step-index[data-step="${nextIdx}"]`);
+      if (!nextRow) return;
+      // Close all, open next
+      document.querySelectorAll('#page-response .step-index').forEach(r => r.classList.remove('open'));
+      nextRow.classList.add('open');
+      setTimeout(() => {
+        const top = nextRow.getBoundingClientRect().top + window.scrollY - 130;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }, 60);
+    });
+  });
+  // Also handle parent divs with data-next
+  document.querySelectorAll('.step-continue[data-next]').forEach(cont => {
+    const btn = cont.querySelector('.step-continue-btn');
+    if (btn && !btn.dataset.next) {
+      btn.dataset.next = cont.dataset.next;
+    }
+  });
+  </script>
+</div>
+<!-- ============================================================ RESPONDERS ============================================================ -->
+<div id="page-responders" class="page">
+
+  <section class="responders-hero">
+    <div class="container responders-hero-inner">
+      <span class="section-label">First-Person. Unscripted. Real.</span>
+      <h1>Meet the Responders</h1>
+      <p style="margin-top:16px;font-size:1.1rem;max-width:54ch;line-height:1.7;color:rgba(26,23,16,0.65);">They are clinicians, peer specialists, outreach workers, crisis counselors, and community members. They are trained, professional, and unarmed. These are their stories, in their own words.</p>
+    </div>
+  </section>
+
+  <!-- FILTER BAR — cleaner, labeled sections -->
+  <div class="filter-bar">
+    <div class="filter-inner">
+      <span class="filter-label">Filter</span>
+      <div class="filter-section">
+        <span class="filter-section-label">Role</span>
+        <div class="filter-group">
+          <button class="filter-btn active">All</button>
+          <button class="filter-btn">Clinician</button>
+          <button class="filter-btn">Peer</button>
+          <button class="filter-btn">Outreach</button>
+          <button class="filter-btn">Leader</button>
+        </div>
+      </div>
+      <div class="filter-section">
+        <span class="filter-section-label">Topic</span>
+        <div class="filter-group">
+          <button class="filter-btn active">All</button>
+          <button class="filter-btn">Safety</button>
+          <button class="filter-btn">What We Do</button>
+          <button class="filter-btn">Outcomes</button>
+          <button class="filter-btn">Why I Do This</button>
+        </div>
+      </div>
+      <div class="filter-section" style="border-right:none;">
+        <span class="filter-section-label">Location</span>
+        <div class="filter-group">
+          <button class="filter-btn active">All</button>
+          <button class="filter-btn">MN</button>
+          <button class="filter-btn">CO</button>
+          <button class="filter-btn">NC</button>
+          <button class="filter-btn">OR</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARCHIVE — shows partial second row on load to signal more below -->
+  <span class="archive-label">Featured</span>
+  <div class="archive-grid">
+    <div class="video-card"><div class="video-card-thumb"><div class="video-card-thumb-inner"><div class="play-icon"><svg width="16" height="18" viewBox="0 0 18 20"><path d="M0 0l18 10L0 20z" fill="rgba(26,23,16,0.25)"/></svg></div></div><div class="video-card-overlay"><div class="play-icon"><svg width="16" height="18" viewBox="0 0 18 20"><path d="M0 0l18 10L0 20z" fill="var(--accent)"/></svg></div></div></div><div class="video-card-info"><div class="video-card-role">Clinician · Minneapolis, MN</div><div class="video-card-name">Responder Name TBD</div><div class="video-card-loc">Safe Streets · What We Do</div></div></div>
+
+    <div class="video-card"><div class="video-card-thumb"><div class="video-card-thumb-inner"><div class="play-icon"><svg width="16" height="18" viewBox="0 0 18 20"><path d="M0 0l18 10L0 20z" fill="rgba(26,23,16,0.25)"/></svg></div></div><div class="video-card-overlay"><div class="play-icon"><svg width="16" height="18" viewBox="0 0 18 20"><path d="M0 0l18 10L0 20z" fill="var(--accent)"/></svg></div></div></div><div class="video-card-info"><div class="video-card-role">Peer Specialist · Denver, CO</div><div class="video-card-name">Responder Name TBD</div><div class="video-card-loc">STAR Program · Outcomes</div></div></div>
+
+    <div class="video-card"><div class="video-card-thumb"><div class="video-card-thumb-inner"><div class="play-icon"><svg width="16" height="18" viewBox="0 0 18 20"><path d="M0 0l18 10L0 20z" fill="rgba(26,23,16,0.25)"/></svg></div></div><div class="video-card-overlay"><div class="play-icon"><svg width="16" height="18" viewBox="0 0 18 20"><path d="M0 0l18 10L0 20z" fill="var(--accent)"/></svg></div></div></div><div class="video-card-info"><div class="video-card-role">Program Leader · Durham, NC</div><div class="video-card-name">Responder Name TBD</div><div class="video-card-loc">HEART · Safety</div></div></div>
+
+    <div class="video-card"><div class="video-card-thumb"><div class="video-card-thumb-inner"><div class="play-icon"><svg width="16" height="18" viewBox="0 0 18 20"><path d="M0 0l18 10L0 20z" fill="rgba(26,23,16,0.25)"/></svg></div></div></div><div class="video-card-info"><div class="video-card-role">Outreach Worker · Portland, OR</div><div class="video-card-name">Responder Name TBD</div><div class="video-card-loc">CAHOOTS · Why I Do This</div></div></div>
+
+    <div class="video-card"><div class="video-card-thumb"><div class="video-card-thumb-inner"><div class="play-icon"><svg width="16" height="18" viewBox="0 0 18 20"><path d="M0 0l18 10L0 20z" fill="rgba(26,23,16,0.25)"/></svg></div></div></div><div class="video-card-info"><div class="video-card-role">Crisis Counselor · Austin, TX</div><div class="video-card-name">Responder Name TBD</div><div class="video-card-loc">ECCO · What We Do</div></div></div>
+
+    <div class="video-card" style="background:var(--bg);border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;min-height:180px;"><div style="text-align:center;padding:28px;"><div class="placeholder-label" style="margin-bottom:8px;">More Coming</div><div class="placeholder-sublabel">Archive grows as programs submit recordings via Rolla.</div></div></div>
+  </div>
+
+  <footer><div class="footer-inner"><div class="footer-bottom" style="padding:24px 0;"><div class="footer-legal"><a href="#">Privacy</a> · <a href="#">Terms</a></div><button class="footer-link" onclick="showPage('home')">← Home</button></div></div></footer>
+</div>
+
+<!-- ============================================================ EVIDENCE ============================================================ -->
+<div id="page-evidence" class="page">
+  <section class="evidence-hero">
+    <div class="container">
+      <span class="section-label">Research & Data</span>
+      <h1>The Evidence Is Clear</h1>
+      <p style="margin-top:16px;font-size:1.1rem;max-width:54ch;line-height:1.7;color:rgba(26,23,16,0.65);">Safe First Response isn't a theory. It's a proven, already-working approach to public safety — with data, research, and results to back it up.</p>
+    </div>
+  </section>
+
+  <!-- INTERIOR NAV -->
+  <div class="sticky-nav" id="ev-sticky-nav">
+    <div class="sticky-nav-inner">
+      <button class="sticky-nav-btn active" data-target="ecomp1" data-nav="evidence">Key Findings</button>
+      <button class="sticky-nav-btn" data-target="ecomp2" data-nav="evidence">By the Numbers</button>
+      <button class="sticky-nav-btn" data-target="ecomp3" data-nav="evidence">National Map</button>
+      <button class="sticky-nav-btn" data-target="ecomp4" data-nav="evidence">Research Database</button>
+    </div>
+  </div>
+
+  <section style="padding:72px 0;border-bottom:1px solid var(--border);" id="ecomp1">
+    <div class="container">
+      <span class="section-label">What the research shows</span>
+      <h2>The findings point in the same direction</h2>
+      <div class="findings-grid">
+        <div class="finding-card"><div class="finding-title">It's safe.</div><div class="finding-body">Programs report no injuries to responders over tens of thousands of responses. Unarmed responders produce dramatically lower use-of-force rates than police response for the same types of calls.</div></div>
+        <div class="finding-card"><div class="finding-title">It works.</div><div class="finding-body">AFR programs consistently achieve high on-scene resolution rates, successful connection to services, and reduced repeat 911 calls for the same individuals.</div></div>
+        <div class="finding-card"><div class="finding-title">It saves money.</div><div class="finding-body">Cost per AFR response is significantly lower than traditional police response — with measurable savings across emergency rooms, police departments, and the court system.</div></div>
+        <div class="finding-card"><div class="finding-title">Police support it.</div><div class="finding-body">Law enforcement officers consistently report these programs make their jobs easier and more effective by reducing inappropriate call volume.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="numbers-band" id="ecomp2">
+    <div class="container">
+      <div class="numbers-grid">
+        <div><div class="number-big">130+</div><div class="number-label">Jurisdictions have launched AFR programs since 2020</div></div>
+        <div><div class="number-big">12M</div><div class="number-label">911 calls annually that don't require police response</div></div>
+        <div><div class="number-big">0</div><div class="number-label">Responder injuries across tens of thousands of responses in leading programs</div></div>
+        <div><div class="number-big">$X</div><div class="number-label">Cost savings per call vs. traditional police response <span style="font-size:0.72rem;opacity:0.6;">(verify with Policing Project)</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding:72px 0;border-bottom:1px solid var(--border);" id="ecomp3">
+    <div class="container">
+      <span class="section-label">National Map</span>
+      <h2 style="margin-bottom:16px;">Where Programs Exist — and What They've Found</h2>
+      <p style="max-width:52ch;margin-bottom:40px;color:rgba(26,23,16,0.65);">More than 130 jurisdictions have launched programs since 2020. This map shows where they are, what they look like, and what the data shows.</p>
+      <div class="placeholder-map">
+        <span class="placeholder-label">Interactive National Map</span>
+        <span class="placeholder-sublabel" style="text-align:center;max-width:34ch;">Same map as homepage, full view. Filterable by state, program type, call volume, outcomes.<br><br>Ref: felonymurderreporting.org</span>
+        <button class="btn btn-outline" style="margin-top:12px;">Explore the Map</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="reports-section" id="ecomp4">
+    <div class="container">
+      <span class="section-label">Research Database</span>
+      <h2 style="margin-bottom:28px;">Reports, Data, and Tools</h2>
+      <p style="max-width:50ch;margin-bottom:36px;color:rgba(26,23,16,0.65);">Research, program data, and policy tools from the Policing Project's national review and beyond.</p>
+      <div class="report-filters">
+        <button class="report-filter active">All Resources</button>
+        <button class="report-filter">Research</button>
+        <button class="report-filter">Program Data</button>
+        <button class="report-filter">Policy Tools</button>
+        <button class="report-filter">Cost Analysis</button>
+      </div>
+      <div class="reports-list">
+        <div class="report-item"><div><div class="report-type">Research</div><div class="report-title">The Denver STAR Program: Cost Analysis and Outcomes</div><div class="report-meta">Dee & Pyne — Placeholder, verify citation · 2021</div></div><div class="report-arrow">→</div></div>
+        <div class="report-item"><div><div class="report-type">Program Data</div><div class="report-title">National Scoping Review of Alternative Response Programs</div><div class="report-meta">The Policing Project — Placeholder, verify date</div></div><div class="report-arrow">→</div></div>
+        <div class="report-item"><div><div class="report-type">Policy Tools</div><div class="report-title">AFR Program Implementation Framework</div><div class="report-meta">Placeholder — replace with actual Policing Project tools</div></div><div class="report-arrow">→</div></div>
+        <div class="report-item"><div><div class="report-type">Research</div><div class="report-title">Responder Safety: A Comparative Analysis</div><div class="report-meta">Placeholder — verify source</div></div><div class="report-arrow">→</div></div>
+        <div class="report-item"><div><div class="report-type">Cost Analysis</div><div class="report-title">Cost-Per-Response Comparison: AFR vs. Traditional Dispatch</div><div class="report-meta">Placeholder — tie to ACS cost graphic when available</div></div><div class="report-arrow">→</div></div>
+      </div>
+    </div>
+  </section>
+
+  <footer><div class="footer-inner"><div class="footer-bottom" style="padding:24px 0;"><div class="footer-legal"><a href="#">Privacy</a> · <a href="#">Terms</a></div><button class="footer-link" onclick="showPage('home')">← Home</button></div></div></footer>
+</div>
+
+<!-- ============================================================ ABOUT ============================================================ -->
+<div id="page-about" class="page">
+  <section class="about-hero">
+    <div class="container">
+      <span class="section-label">About this project</span>
+      <h1>About This Project</h1>
+      <p style="margin-top:16px;font-size:1.1rem;max-width:58ch;line-height:1.7;color:rgba(26,23,16,0.65);">The 12 Million Calls Initiative is a storytelling and advocacy project built to accelerate the adoption of Safe First Response programs nationwide — by making the case clearly, compellingly, and in the words of the people closest to the work.</p>
+    </div>
+  </section>
+
+  <section class="why-block">
+    <div class="container">
+      <div class="why-grid">
+        <div>
+          <span class="section-label">Why this moment</span>
+          <h2 style="margin-bottom:20px;">Why This Moment Matters</h2>
+          <p>Programs that send trained, unarmed professionals to respond to non-violent concerns are working across the country. When people hear about them, they broadly support them. The research is clear. The results are documented.</p>
+          <p>And yet Safe First Response remains vastly underfunded — viewed by too many decision-makers as an interesting idea rather than a proven public safety solution.</p>
+          <p>The gap isn't evidence. The gap is awareness, imagination, and political will. This project exists to close that gap.</p>
+        </div>
+        <div style="display:flex;align-items:center;">
+          <div class="why-pull">The gap isn't evidence. The gap is awareness, imagination, and political will.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="partners-block">
+    <div class="container">
+      <span class="section-label">Project stewardship</span>
+      <h2 style="margin-bottom:36px;">Who Is Leading This Work</h2>
+      <div class="partner-card-single">
+        <div class="partner-name">The Policing Project at NYU School of Law</div>
+        <div class="partner-body">The Policing Project works to make policing more democratic, equitable, and effective — through research, policy, and community engagement. Its national review of Alternative Response Programs is the most comprehensive assessment of AFR effectiveness to date. The Policing Project leads this initiative, stewards its research infrastructure, and connects programs, policymakers, and communities across the country.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="approach-block">
+    <div class="container">
+      <div class="approach-grid">
+        <div>
+          <span class="section-label">How we work</span>
+          <h2 style="margin-bottom:18px;">How We Tell This Story</h2>
+          <p>This project is built on a core belief: the most powerful advocates for Safe First Response are the people doing the work.</p>
+          <p>That's why the center of this initiative is a growing archive of first-person video — responders, program leaders, community partners, and law enforcement allies speaking in their own words.</p>
+          <p>We pair those stories with rigorous research, accessible data, and a clear policy framework. Because proof matters — and decision-makers need both the human story and the evidence to act.</p>
+        </div>
+        <div>
+          <span class="section-label">Our values</span>
+          <h3 style="margin-bottom:4px;">How We Work</h3>
+          <div class="values-list">
+            <div class="value-item"><div class="value-dot"></div>We center the voices of the people closest to the work.</div>
+            <div class="value-item"><div class="value-dot"></div>We prioritize informed consent, dignity, and agency in all storytelling.</div>
+            <div class="value-item"><div class="value-dot"></div>We use language carefully — avoiding frames that distort or diminish this work.</div>
+            <div class="value-item"><div class="value-dot"></div>We present evidence honestly, including what programs are still working to improve.</div>
+            <div class="value-item"><div class="value-dot"></div>We build tools designed to last — not just to launch.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding:72px 0;text-align:center;background:var(--surface);border-top:1px solid var(--border);">
+    <div class="container">
+      <h2 style="margin-bottom:28px;">Want to be part of this?</h2>
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="showPage('get-involved')">Get Involved</button>
+        <button class="btn btn-outline" onclick="showPage('response')">Explore the Response</button>
+        <button class="btn btn-outline" onclick="showPage('responders')">Meet the Responders</button>
+      </div>
+    </div>
+  </section>
+
+  <footer><div class="footer-inner"><div class="footer-bottom" style="padding:24px 0;"><div class="footer-legal"><a href="#">Privacy</a> · <a href="#">Terms</a></div><button class="footer-link" onclick="showPage('home')">← Home</button></div></div></footer>
+</div>
+
+<!-- ============================================================ GET INVOLVED ============================================================ -->
+<div id="page-get-involved" class="page">
+  <section class="gi-hero">
+    <div class="container">
+      <span class="section-label">Take action</span>
+      <h1>Get Involved</h1>
+      <p style="margin-top:16px;font-size:1.1rem;max-width:52ch;line-height:1.7;color:rgba(26,23,16,0.65);">Safe First Response is already working. What happens next depends on whether enough people — in the right positions — see it, believe it, and invest in it.</p>
+    </div>
+  </section>
+
+  <div class="audiences-grid">
+    <div class="audience-card"><div class="audience-title">Policymakers & City Leaders</div><div class="audience-list"><div class="audience-item">Adopt or expand an AFR program in your jurisdiction</div><div class="audience-item">Fund alternate destination infrastructure</div><div class="audience-item">Reform dispatch triage protocols</div><div class="audience-item">Mandate alarm verification</div></div><button class="btn btn-text">Contact the Policing Project</button></div>
+    <div class="audience-card"><div class="audience-title">Program Leaders & Practitioners</div><div class="audience-list"><div class="audience-item">Connect with the national network of AFR programs</div><div class="audience-item">Access research, tools, and policy frameworks</div><div class="audience-item">Share your program's story in the video archive</div></div><button class="btn btn-text">Join the Network</button></div>
+    <div class="audience-card"><div class="audience-title">Community Advocates</div><div class="audience-list"><div class="audience-item">Learn what Safe First Response looks like and how to talk about it</div><div class="audience-item">Share your story or connect us with responders in your community</div><div class="audience-item">Push your local government to invest in AFR</div></div><button class="btn btn-text">Share Your Story</button></div>
+    <div class="audience-card"><div class="audience-title">Funders & Philanthropists</div><div class="audience-list"><div class="audience-item">Fund AFR program expansion in underinvested communities</div><div class="audience-item">Invest in the storytelling infrastructure</div><div class="audience-item">Support research, data, and policy tools</div></div><button class="btn btn-text">Get in Touch</button></div>
+  </div>
+
+  <section class="contact-block">
+    <div class="container">
+      <div class="contact-grid">
+        <div>
+          <span class="section-label">Reach us</span>
+          <h2 style="margin-bottom:18px;">We want to hear from you.</h2>
+          <p style="color:rgba(26,23,16,0.65);">Whether you're a program leader, policymaker, journalist, or community member — we want to hear from you.</p>
+          <div style="margin-top:36px;display:flex;flex-direction:column;gap:18px;">
+            <div><div style="font-size:0.6rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);margin-bottom:5px;">Email</div><div style="color:var(--text-muted);">TBD — Policing Project to supply</div></div>
+            <div><div style="font-size:0.6rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);margin-bottom:5px;">Phone</div><div style="color:var(--text-muted);">TBD — Policing Project to supply</div></div>
+            <div><div style="font-size:0.6rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);margin-bottom:5px;">Address</div><div style="color:var(--text-muted);">TBD — Policing Project to supply</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="form-placeholder">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div><div class="form-field-label-text" style="margin-bottom:5px;">Name</div><div class="form-field-placeholder"></div></div>
+              <div><div class="form-field-label-text" style="margin-bottom:5px;">Email</div><div class="form-field-placeholder"></div></div>
+            </div>
+            <div><div class="form-field-label-text" style="margin-bottom:5px;">Organization</div><div class="form-field-placeholder"></div></div>
+            <div><div class="form-field-label-text" style="margin-bottom:5px;">Role</div><div class="form-field-placeholder"><span style="font-size:0.75rem;color:var(--text-dim);">Select your role ▾</span></div></div>
+            <div><div class="form-field-label-text" style="margin-bottom:5px;">Message</div><div class="form-field-placeholder textarea"></div></div>
+            <button class="btn btn-primary" style="align-self:flex-start;">Send Message</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div><span class="footer-logo">12 Million Calls Initiative</span><p class="footer-tagline">A project of the Policing Project at NYU School of Law, in partnership with Zealous and the Joyce Foundation.</p></div>
+        <div><div class="footer-col-title">Navigate</div><div class="footer-links"><button class="footer-link" onclick="showPage('response')">Response</button><button class="footer-link" onclick="showPage('responders')">Responders</button><button class="footer-link" onclick="showPage('evidence')">Evidence</button><button class="footer-link" onclick="showPage('about')">About</button></div></div>
+        <div><div class="footer-col-title">Contact</div><div class="footer-links"><span class="footer-link">Email (TBD)</span><span class="footer-link">Phone (TBD)</span><span class="footer-link">Address (TBD)</span></div></div>
+        <div></div>
+      </div>
+      <div class="footer-bottom"><div class="footer-legal"><a href="#">Privacy Policy</a> · <a href="#">Terms of Use</a></div><div class="footer-legal">© 2025 The Policing Project</div></div>
+    </div>
+  </footer>
+</div>
+
+<script>
+  // PAGE NAV
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + id).classList.add('active');
+    document.querySelectorAll('.nav-link').forEach(l => {
+      l.classList.toggle('active', l.getAttribute('onclick') && l.getAttribute('onclick').includes("'" + id + "'"));
+    });
+    window.scrollTo(0, 0);
+  }
+
+  // MISCONCEPTIONS ACCORDION
+  document.querySelectorAll('.misc-truth-item').forEach(item => {
+    item.addEventListener('click', function() {
+      document.querySelectorAll('.misc-truth-item').forEach(i => i.classList.remove('active'));
+      document.querySelectorAll('.misc-detail').forEach(d => d.classList.remove('active'));
+      this.classList.add('active');
+      const idx = this.dataset.index;
+      document.querySelector(`.misc-detail[data-index="${idx}"]`).classList.add('active');
+    });
+  });
+
+  // STEP ACCORDION (response page)
+  document.querySelectorAll('.step-row').forEach(row => {
+    row.querySelector('.step-header').addEventListener('click', function() {
+      const isOpen = row.classList.contains('open');
+      document.querySelectorAll('.step-row').forEach(r => r.classList.remove('open'));
+      if (!isOpen) row.classList.add('open');
+    });
+  });
+
+  // STICKY NAV — response page
+  const respNavBtns = document.querySelectorAll('#resp-sticky-nav .sticky-nav-btn');
+  respNavBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      respNavBtns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      const target = document.getElementById(this.dataset.target);
+      if (target) { const top = target.getBoundingClientRect().top + window.scrollY - 120; window.scrollTo({ top, behavior: 'smooth' }); }
+    });
+  });
+
+  // STICKY NAV — evidence page
+  const evNavBtns = document.querySelectorAll('#ev-sticky-nav .sticky-nav-btn');
+  evNavBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      evNavBtns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      const target = document.getElementById(this.dataset.target);
+      if (target) { const top = target.getBoundingClientRect().top + window.scrollY - 120; window.scrollTo({ top, behavior: 'smooth' }); }
+    });
+  });
+
+  // Scroll-update sticky navs
+  window.addEventListener('scroll', () => {
+    const rComps = ['rcomp1','rcomp2','rcomp3','rcomp4'];
+    let rCurrent = rComps[0];
+    rComps.forEach(id => { const el = document.getElementById(id); if (el && el.getBoundingClientRect().top < 180) rCurrent = id; });
+    respNavBtns.forEach(b => b.classList.toggle('active', b.dataset.target === rCurrent));
+
+    const eComps = ['ecomp1','ecomp2','ecomp3','ecomp4'];
+    let eCurrent = eComps[0];
+    eComps.forEach(id => { const el = document.getElementById(id); if (el && el.getBoundingClientRect().top < 180) eCurrent = id; });
+    evNavBtns.forEach(b => b.classList.toggle('active', b.dataset.target === eCurrent));
+  });
+
+  // FILTER BTN groups
+  document.querySelectorAll('.filter-section').forEach(section => {
+    section.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        section.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+  });
+
+  document.querySelectorAll('.report-filter').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.report-filter').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
