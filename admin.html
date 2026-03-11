@@ -8,755 +8,391 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,300&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f5f2ec;
-    --surface: #ffffff;
-    --border: rgba(26,23,16,0.1);
-    --border-strong: rgba(26,23,16,0.2);
-    --text: #1a1710;
-    --text-muted: rgba(26,23,16,0.5);
-    --text-dim: rgba(26,23,16,0.35);
-    --accent: #b5873c;
-    --accent-bg: rgba(181,135,60,0.08);
-    --sidebar-bg: #1a1710;
-    --sidebar-text: rgba(245,242,236,0.75);
-    --sidebar-active: rgba(181,135,60,0.15);
-    --sidebar-active-text: #c9a96e;
-    --saved-green: #2d7a4e;
+    --bg:#f5f2ec;--surface:#fff;--border:rgba(26,23,16,.1);--border-strong:rgba(26,23,16,.22);
+    --text:#1a1710;--text-muted:rgba(26,23,16,.5);--text-dim:rgba(26,23,16,.33);
+    --accent:#b5873c;--accent-bg:rgba(181,135,60,.08);
+    --sb-bg:#1a1710;--sb-text:rgba(245,242,236,.7);--sb-active:rgba(181,135,60,.15);--sb-active-text:#c9a96e;
+    --green:#2d7a4e;
   }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Barlow', sans-serif; font-weight: 300; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
-
-  /* ===== SIDEBAR ===== */
-  .sidebar {
-    width: 240px; flex-shrink: 0; background: var(--sidebar-bg);
-    display: flex; flex-direction: column; overflow: hidden;
-    border-right: 1px solid rgba(255,255,255,0.06);
-  }
-
-  .sidebar-header {
-    padding: 20px 20px 16px;
-    border-bottom: 1px solid rgba(255,255,255,0.07);
-  }
-  .sidebar-logo {
-    font-family: 'Fraunces', serif; font-size: 0.88rem; color: #f0ede6; font-weight: 400; display: block; margin-bottom: 4px;
-  }
-  .sidebar-sub {
-    font-size: 0.62rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--accent); opacity: 0.7;
-  }
-
-  .sidebar-nav { flex: 1; overflow-y: auto; padding: 12px 0; }
-  .sidebar-section-header {
-    font-size: 0.55rem; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase;
-    color: rgba(245,242,236,0.2); padding: 14px 20px 6px; margin-top: 4px;
-  }
-  .sidebar-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 9px 20px; cursor: pointer; transition: all 0.15s;
-    font-size: 0.8rem; color: var(--sidebar-text); border: none; background: none;
-    width: 100%; text-align: left;
-  }
-  .sidebar-item:hover { background: rgba(255,255,255,0.04); color: #f0ede6; }
-  .sidebar-item.active { background: var(--sidebar-active); color: var(--sidebar-active-text); }
-  .sidebar-item-dot {
-    width: 5px; height: 5px; border-radius: 50%; background: var(--accent); opacity: 0.4; flex-shrink: 0; transition: opacity 0.15s;
-  }
-  .sidebar-item.active .sidebar-item-dot,
-  .sidebar-item.has-edits .sidebar-item-dot { opacity: 1; }
-
-  .sidebar-footer {
-    padding: 14px 16px; border-top: 1px solid rgba(255,255,255,0.07);
-    display: flex; flex-direction: column; gap: 8px;
-  }
-  .btn-export {
-    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
-    background: var(--accent); color: #1a1710; border: none; padding: 10px 0;
-    cursor: pointer; transition: background 0.2s; width: 100%; border-radius: 1px;
-  }
-  .btn-export:hover { background: #c9a96e; }
-  .btn-preview {
-    font-size: 0.7rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
-    background: transparent; color: rgba(245,242,236,0.5); border: 1px solid rgba(255,255,255,0.1);
-    padding: 9px 0; cursor: pointer; transition: all 0.2s; width: 100%;
-  }
-  .btn-preview:hover { color: #f0ede6; border-color: rgba(255,255,255,0.3); }
-
-  /* ===== MAIN EDITOR ===== */
-  .editor-main {
-    flex: 1; overflow-y: auto; display: flex; flex-direction: column;
-  }
-
-  .editor-topbar {
-    background: var(--surface); border-bottom: 1px solid var(--border);
-    padding: 0 32px; height: 52px; display: flex; align-items: center; justify-content: space-between;
-    position: sticky; top: 0; z-index: 10; flex-shrink: 0;
-  }
-  .editor-topbar-title {
-    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent);
-  }
-  .editor-topbar-right { display: flex; align-items: center; gap: 16px; }
-  .save-status {
-    font-size: 0.7rem; font-weight: 400; color: var(--text-dim); transition: color 0.3s;
-  }
-  .save-status.saved { color: var(--saved-green); }
-  .btn-reset-section {
-    font-size: 0.65rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--text-dim); background: none; border: 1px solid var(--border); padding: 6px 14px;
-    cursor: pointer; transition: all 0.2s;
-  }
-  .btn-reset-section:hover { color: var(--text); border-color: var(--border-strong); }
-
-  .editor-body { padding: 32px; flex: 1; }
-
-  /* FIELD GROUPS */
-  .field-group {
-    background: var(--surface); border: 1px solid var(--border); margin-bottom: 20px;
-    border-radius: 2px; overflow: hidden;
-  }
-  .field-group-header {
-    padding: 14px 20px; background: var(--bg); border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; gap: 10px;
-  }
-  .field-group-title {
-    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent);
-  }
-  .field-group-desc {
-    font-size: 0.72rem; color: var(--text-muted); margin-left: auto;
-  }
-
-  .field-row {
-    display: grid; grid-template-columns: 180px 1fr; border-bottom: 1px solid var(--border);
-  }
-  .field-row:last-child { border-bottom: none; }
-
-  .field-label-col {
-    padding: 16px 20px; background: rgba(26,23,16,0.015); border-right: 1px solid var(--border);
-    display: flex; flex-direction: column; gap: 4px;
-  }
-  .field-label {
-    font-size: 0.72rem; font-weight: 500; color: var(--text); line-height: 1.3;
-  }
-  .field-hint {
-    font-size: 0.65rem; color: var(--text-dim); line-height: 1.4;
-  }
-  .field-key {
-    font-size: 0.58rem; font-family: monospace; color: rgba(26,23,16,0.25); margin-top: 4px;
-  }
-
-  .field-input-col { padding: 12px 16px; display: flex; align-items: flex-start; }
-
-  .field-input {
-    width: 100%; background: transparent; border: none; outline: none;
-    font-family: 'Barlow', sans-serif; font-size: 0.88rem; font-weight: 300;
-    color: var(--text); line-height: 1.55; resize: none; min-height: 36px;
-    padding: 4px 0; transition: background 0.15s; border-radius: 0;
-  }
-  .field-input:focus { background: var(--accent-bg); padding: 4px 8px; margin: 0 -8px; width: calc(100% + 16px); }
-  .field-input.modified { color: var(--accent-dark, #8a6228); }
-
-  /* SECTION PLACEHOLDER */
-  .section-placeholder {
-    display: flex; align-items: center; justify-content: center; flex-direction: column;
-    gap: 12px; min-height: 300px; color: var(--text-dim); text-align: center;
-  }
-  .section-placeholder h3 { font-family: 'Fraunces', serif; font-weight: 400; font-size: 1.2rem; color: var(--text-muted); }
-  .section-placeholder p { font-size: 0.82rem; }
-
-  /* TOAST */
-  .toast {
-    position: fixed; bottom: 24px; right: 24px; background: var(--text); color: #f0ede6;
-    padding: 12px 20px; font-size: 0.78rem; font-weight: 500; opacity: 0;
-    transition: opacity 0.3s; pointer-events: none; z-index: 999;
-  }
-  .toast.show { opacity: 1; }
-
-  /* CHARACTER COUNT */
-  .char-count {
-    font-size: 0.6rem; color: var(--text-dim); margin-top: 4px; text-align: right; flex-shrink: 0;
-    align-self: flex-end; padding-left: 8px; white-space: nowrap;
-  }
-
-  /* STEP SELECTOR (for response page) */
-  .step-selector {
-    display: flex; gap: 2px; padding: 16px 20px 0; flex-wrap: wrap;
-  }
-  .step-select-btn {
-    font-size: 0.65rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
-    padding: 7px 14px; background: var(--bg); border: 1px solid var(--border);
-    cursor: pointer; transition: all 0.15s; color: var(--text-muted);
-  }
-  .step-select-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-
-  /* PAGES NAV (inside editor for sections) */
-  .section-nav { display: none; }
-  .section-nav.active { display: block; }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Barlow',sans-serif;font-weight:300;background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden;}
+  .sidebar{width:220px;flex-shrink:0;background:var(--sb-bg);display:flex;flex-direction:column;overflow:hidden;}
+  .sb-header{padding:18px 18px 14px;border-bottom:1px solid rgba(255,255,255,.07);}
+  .sb-logo{font-family:'Fraunces',serif;font-size:.85rem;color:#f0ede6;display:block;margin-bottom:3px;}
+  .sb-sub{font-size:.58rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);opacity:.7;}
+  .sb-nav{flex:1;overflow-y:auto;padding:10px 0;}
+  .sb-group{font-size:.52rem;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:rgba(245,242,236,.2);padding:12px 18px 5px;margin-top:2px;}
+  .sb-item{display:flex;align-items:center;gap:9px;padding:8px 18px;cursor:pointer;font-size:.77rem;color:var(--sb-text);border:none;background:none;width:100%;text-align:left;transition:all .15s;}
+  .sb-item:hover{background:rgba(255,255,255,.04);color:#f0ede6;}
+  .sb-item.active{background:var(--sb-active);color:var(--sb-active-text);}
+  .sb-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);opacity:.35;flex-shrink:0;transition:opacity .15s;}
+  .sb-item.active .sb-dot,.sb-item.has-edits .sb-dot{opacity:1;}
+  .sb-footer{padding:12px 14px;border-top:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;gap:7px;}
+  .btn-export{font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;background:var(--accent);color:#1a1710;border:none;padding:10px 0;cursor:pointer;width:100%;transition:background .2s;}
+  .btn-export:hover{background:#c9a96e;}
+  .btn-preview{font-size:.68rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;background:transparent;color:rgba(245,242,236,.45);border:1px solid rgba(255,255,255,.1);padding:8px 0;cursor:pointer;width:100%;transition:all .2s;}
+  .btn-preview:hover{color:#f0ede6;border-color:rgba(255,255,255,.3);}
+  .editor-main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
+  .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;height:50px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;flex-shrink:0;}
+  .topbar-title{font-size:.68rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);}
+  .topbar-right{display:flex;align-items:center;gap:14px;}
+  .save-status{font-size:.68rem;color:var(--text-dim);transition:color .3s;}
+  .save-status.saved{color:var(--green);}
+  .btn-reset{font-size:.62rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--text-dim);background:none;border:1px solid var(--border);padding:5px 12px;cursor:pointer;transition:all .2s;}
+  .btn-reset:hover{color:var(--text);border-color:var(--border-strong);}
+  .editor-body{padding:28px;flex:1;}
+  .section-nav{display:none;}
+  .section-nav.active{display:block;}
+  .fg{background:var(--surface);border:1px solid var(--border);margin-bottom:18px;border-radius:2px;overflow:hidden;}
+  .fg-header{padding:12px 18px;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:baseline;gap:10px;}
+  .fg-title{font-size:.62rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);}
+  .fg-desc{font-size:.7rem;color:var(--text-muted);margin-left:auto;}
+  .fr{display:grid;grid-template-columns:168px 1fr;border-bottom:1px solid var(--border);}
+  .fr:last-child{border-bottom:none;}
+  .fl{padding:14px 16px;background:rgba(26,23,16,.015);border-right:1px solid var(--border);display:flex;flex-direction:column;gap:3px;}
+  .fl-label{font-size:.7rem;font-weight:500;color:var(--text);line-height:1.3;}
+  .fl-hint{font-size:.62rem;color:var(--text-dim);line-height:1.35;}
+  .fl-key{font-size:.56rem;font-family:monospace;color:rgba(26,23,16,.22);margin-top:3px;}
+  .fi-col{padding:10px 14px;display:flex;align-items:flex-start;}
+  .fi{width:100%;background:transparent;border:none;outline:none;font-family:'Barlow',sans-serif;font-size:.86rem;font-weight:300;color:var(--text);line-height:1.55;resize:none;min-height:32px;padding:3px 0;transition:background .15s;}
+  .fi:focus{background:var(--accent-bg);padding:3px 7px;margin:0 -7px;width:calc(100% + 14px);}
+  .fi.modified{color:#8a6228;}
+  .step-tabs{display:flex;gap:2px;padding:14px 18px;flex-wrap:wrap;background:var(--surface);border-bottom:1px solid var(--border);}
+  .step-tab{font-size:.62rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:6px 12px;background:var(--bg);border:1px solid var(--border);cursor:pointer;color:var(--text-muted);transition:all .15s;}
+  .step-tab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .toast{position:fixed;bottom:22px;right:22px;background:var(--text);color:#f0ede6;padding:11px 18px;font-size:.76rem;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;}
+  .toast.show{opacity:1;}
 </style>
 </head>
 <body>
-
-<!-- SIDEBAR -->
 <aside class="sidebar">
-  <div class="sidebar-header">
-    <span class="sidebar-logo">12 Million Calls</span>
-    <span class="sidebar-sub">Content Editor</span>
+  <div class="sb-header">
+    <span class="sb-logo">12 Million Calls</span>
+    <span class="sb-sub">Content Editor</span>
   </div>
-
-  <nav class="sidebar-nav">
-    <div class="sidebar-section-header">Global</div>
-    <button class="sidebar-item active" data-section="home" onclick="showSection('home', this)">
-      <span class="sidebar-item-dot"></span> Homepage
-    </button>
-    <button class="sidebar-item" data-section="misc" onclick="showSection('misc', this)">
-      <span class="sidebar-item-dot"></span> Misconceptions
-    </button>
-
-    <div class="sidebar-section-header">Pages</div>
-    <button class="sidebar-item" data-section="response_hero" onclick="showSection('response_hero', this)">
-      <span class="sidebar-item-dot"></span> Response — Intro
-    </button>
-    <button class="sidebar-item" data-section="steps" onclick="showSection('steps', this)">
-      <span class="sidebar-item-dot"></span> Response — 7 Steps
-    </button>
-    <button class="sidebar-item" data-section="responders" onclick="showSection('responders', this)">
-      <span class="sidebar-item-dot"></span> Responders
-    </button>
-    <button class="sidebar-item" data-section="evidence" onclick="showSection('evidence', this)">
-      <span class="sidebar-item-dot"></span> Evidence
-    </button>
-    <button class="sidebar-item" data-section="about" onclick="showSection('about', this)">
-      <span class="sidebar-item-dot"></span> About
-    </button>
-    <button class="sidebar-item" data-section="gi" onclick="showSection('gi', this)">
-      <span class="sidebar-item-dot"></span> Get Involved
-    </button>
+  <nav class="sb-nav">
+    <div class="sb-group">Homepage</div>
+    <button class="sb-item active" data-section="home_hero" onclick="show('home_hero',this)"><span class="sb-dot"></span>Hero</button>
+    <button class="sb-item" data-section="home_intro" onclick="show('home_intro',this)"><span class="sb-dot"></span>Introduction</button>
+    <button class="sb-item" data-section="home_video" onclick="show('home_video',this)"><span class="sb-dot"></span>Video Teaser</button>
+    <button class="sb-item" data-section="home_misc" onclick="show('home_misc',this)"><span class="sb-dot"></span>Misconceptions</button>
+    <button class="sb-item" data-section="home_map" onclick="show('home_map',this)"><span class="sb-dot"></span>Map + Stats</button>
+    <button class="sb-item" data-section="home_news" onclick="show('home_news',this)"><span class="sb-dot"></span>In the News</button>
+    <button class="sb-item" data-section="home_end" onclick="show('home_end',this)"><span class="sb-dot"></span>End Block</button>
+    <div class="sb-group">Response Page</div>
+    <button class="sb-item" data-section="resp_intro" onclick="show('resp_intro',this)"><span class="sb-dot"></span>Page Intro</button>
+    <button class="sb-item" data-section="resp_c1" onclick="show('resp_c1',this)"><span class="sb-dot"></span>Pre-Response Diversion</button>
+    <button class="sb-item" data-section="resp_steps" onclick="show('resp_steps',this)"><span class="sb-dot"></span>7 Steps</button>
+    <button class="sb-item" data-section="resp_c3" onclick="show('resp_c3',this)"><span class="sb-dot"></span>Alternate Destinations</button>
+    <button class="sb-item" data-section="resp_c4" onclick="show('resp_c4',this)"><span class="sb-dot"></span>Second Response</button>
+    <div class="sb-group">Interior Pages</div>
+    <button class="sb-item" data-section="responders" onclick="show('responders',this)"><span class="sb-dot"></span>Responders</button>
+    <button class="sb-item" data-section="evidence" onclick="show('evidence',this)"><span class="sb-dot"></span>Evidence</button>
+    <button class="sb-item" data-section="about" onclick="show('about',this)"><span class="sb-dot"></span>About</button>
+    <button class="sb-item" data-section="gi" onclick="show('gi',this)"><span class="sb-dot"></span>Get Involved</button>
   </nav>
-
-  <div class="sidebar-footer">
-    <button class="btn-preview" onclick="openPreview()">↗ Preview Site</button>
+  <div class="sb-footer">
+    <button class="btn-preview" onclick="window.open('index.html','_blank')">↗ Preview Site</button>
     <button class="btn-export" onclick="exportSite()">⬇ Export index.html</button>
   </div>
 </aside>
 
-<!-- EDITOR MAIN -->
 <main class="editor-main">
-
-  <div class="editor-topbar">
-    <span class="editor-topbar-title" id="section-label">Homepage</span>
-    <div class="editor-topbar-right">
+  <div class="topbar">
+    <span class="topbar-title" id="section-label">Hero</span>
+    <div class="topbar-right">
       <span class="save-status" id="save-status">All changes saved</span>
-      <button class="btn-reset-section" onclick="resetSection()">Reset section</button>
+      <button class="btn-reset" onclick="resetSection()">Reset section</button>
     </div>
   </div>
-
   <div class="editor-body">
 
-    <!-- ===== HOME ===== -->
-    <div id="section-home" class="section-nav active">
-      <div class="field-group">
-        <div class="field-group-header">
-          <span class="field-group-title">Hero</span>
-          <span class="field-group-desc">Top of homepage — first thing visitors see</span>
-        </div>
-        <div class="field-row">
-          <div class="field-label-col"><span class="field-label">Eyebrow</span><span class="field-hint">Small label above headline</span><span class="field-key">home_hero_eyebrow</span></div>
-          <div class="field-input-col"><textarea class="field-input" data-key="home_hero_eyebrow" rows="1">Safe First Response</textarea></div>
-        </div>
-        <div class="field-row">
-          <div class="field-label-col"><span class="field-label">Headline</span><span class="field-hint">Main hero headline. Use &lt;br&gt; for line breaks, &lt;em&gt; for italic/gold text</span><span class="field-key">home_hero_headline</span></div>
-          <div class="field-input-col"><textarea class="field-input" data-key="home_hero_headline" rows="3">Police receive over 240 million<br><em>911 calls</em> each year.</textarea></div>
-        </div>
-        <div class="field-row">
-          <div class="field-label-col"><span class="field-label">Subtitle</span><span class="field-hint">One sentence below headline</span><span class="field-key">home_hero_sub</span></div>
-          <div class="field-input-col"><textarea class="field-input" data-key="home_hero_sub" rows="2">What if even a small share were routed to responders trained to meet people's actual needs?</textarea></div>
-        </div>
-      </div>
-
-      <div class="field-group">
-        <div class="field-group-header">
-          <span class="field-group-title">Introduction Block</span>
-          <span class="field-group-desc">Plain-language explanation below hero</span>
-        </div>
-        <div class="field-row">
-          <div class="field-label-col"><span class="field-label">Section Label</span><span class="field-hint">Small caps above heading</span><span class="field-key">home_intro_label</span></div>
-          <div class="field-input-col"><textarea class="field-input" data-key="home_intro_label" rows="1">What is Safe First Response?</textarea></div>
-        </div>
-        <div class="field-row">
-          <div class="field-label-col"><span class="field-label">Body Text</span><span class="field-hint">Main explanatory paragraph</span><span class="field-key">home_intro_body</span></div>
-          <div class="field-input-col"><textarea class="field-input" data-key="home_intro_body" rows="4">In cities and towns across the country, trained responders are handling 911 calls that do not require police. These unarmed safety responders address concerns involving mental health, substance use, disputes, and welfare checks — resolving issues with care, reducing harm, and improving public safety.</textarea></div>
-        </div>
-      </div>
-
-      <div class="field-group">
-        <div class="field-group-header">
-          <span class="field-group-title">Video Archive Teaser</span>
-        </div>
-        <div class="field-row">
-          <div class="field-label-col"><span class="field-label">Headline</span><span class="field-key">home_video_headline</span></div>
-          <div class="field-input-col"><textarea class="field-input" data-key="home_video_headline" rows="2">Hear directly from the people doing this work —<br>in their own words.</textarea></div>
-        </div>
-      </div>
-
-      <div class="field-group">
-        <div class="field-group-header">
-          <span class="field-group-title">Map Entry Point</span>
-        </div>
-        <div class="field-row">
-          <div class="field-label-col"><span class="field-label">Headline</span><span class="field-key">home_map_headline</span></div>
-          <div class="field-input-col"><textarea class="field-input" data-key="home_map_headline" rows="2">What patterns emerge when millions of calls are handled differently?</textarea></div>
-        </div>
-      </div>
-
-      <div class="field-group">
-        <div class="field-group-header">
-          <span class="field-group-title">End of Page Block</span>
-          <span class="field-group-desc">About / Get Involved section at bottom of homepage</span>
-        </div>
-        <div class="field-row">
-          <div class="field-label-col"><span class="field-label">Headline</span><span class="field-key">home_end_headline</span></div>
-          <div class="field-input-col"><textarea class="field-input" data-key="home_end_headline" rows="3">This project is led by the Policing Project in partnership with practitioners, researchers, and communities across the country.</textarea></div>
-        </div>
+    <div id="sec-home_hero" class="section-nav active">
+      <div class="fg"><div class="fg-header"><span class="fg-title">Hero</span><span class="fg-desc">First thing visitors see</span></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Eyebrow</span><span class="fl-hint">Small label above headline</span><span class="fl-key">home_hero_eyebrow</span></div><div class="fi-col"><textarea class="fi" data-key="home_hero_eyebrow" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Headline</span><span class="fl-hint">Use &lt;br&gt; for breaks, &lt;em&gt; for italic gold</span><span class="fl-key">home_hero_headline</span></div><div class="fi-col"><textarea class="fi" data-key="home_hero_headline" rows="2"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Subtitle</span><span class="fl-key">home_hero_sub</span></div><div class="fi-col"><textarea class="fi" data-key="home_hero_sub" rows="2"></textarea></div></div>
       </div>
     </div>
 
-    <!-- ===== MISCONCEPTIONS ===== -->
-    <div id="section-misc" class="section-nav">
-      <div class="field-group">
-        <div class="field-group-header">
-          <span class="field-group-title">Misconceptions Accordion</span>
-          <span class="field-group-desc">Left column = clickable truth statement. Right column = detail that expands.</span>
-        </div>
-
-        <div class="field-row" style="background:var(--accent-bg);">
-          <div class="field-label-col"><span class="field-label">Truth 1 — Left</span><span class="field-hint">Clickable statement</span><span class="field-key">misc_truth_0</span></div>
-          <div class="field-input-col"><textarea class="field-input" data-key="misc_truth_0" rows="2">Unarmed response dramatically reduces escalation</textarea></div>
-        </div>
-        <div class="field-row">
-          <div class="field-label-col"><span class="field-label">Truth 2 — Left</span><span class="field-key">misc_truth_1</span></div>
-          <div class="field-input-col"><textarea class="field-input" data-key="misc_truth_1" rows="2">Responders are trained professionals</textarea></div>
-        </div>
-        <div class="field-row">
-          <div class="field-label-col"><span class="field-label">Truth 3 — Left</span><span class="field-key">misc_truth_2</span></div>
-          <div class="field-input-col"><textarea class="field-input" data-key="misc_truth_2" rows="2">Safe First Response saves public dollars</textarea></div>
-        </div>
-        <div class="field-row">
-          <div class="field-label-col"><span class="field-label">Truth 4 — Left</span><span class="field-key">misc_truth_3</span></div>
-          <div class="field-input-col"><textarea class="field-input" data-key="misc_truth_3" rows="2">These models work in cities and rural communities</textarea></div>
-        </div>
-        <div class="field-row">
-          <div class="field-label-col"><span class="field-label">Truth 5 — Left</span><span class="field-key">misc_truth_4</span></div>
-          <div class="field-input-col"><textarea class="field-input" data-key="misc_truth_4" rows="2">This strengthens — not weakens — public safety</textarea></div>
-        </div>
+    <div id="sec-home_intro" class="section-nav">
+      <div class="fg"><div class="fg-header"><span class="fg-title">Introduction Block</span></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Section Label</span><span class="fl-hint">Small caps above heading</span><span class="fl-key">home_intro_label</span></div><div class="fi-col"><textarea class="fi" data-key="home_intro_label" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Body Text</span><span class="fl-key">home_intro_body</span></div><div class="fi-col"><textarea class="fi" data-key="home_intro_body" rows="4"></textarea></div></div>
       </div>
     </div>
 
-    <!-- ===== RESPONSE HERO ===== -->
-    <div id="section-response_hero" class="section-nav">
-      <div class="field-group">
-        <div class="field-group-header">
-          <span class="field-group-title">Response Page — Intro</span>
-        </div>
-        <div class="field-row">
-          <div class="field-label-col"><span class="field-label">Page Title</span><span class="field-key">resp_hero_title</span></div>
-          <div class="field-input-col"><textarea class="field-input" data-key="resp_hero_title" rows="1">How Safe First Response Works</textarea></div>
-        </div>
+    <div id="sec-home_video" class="section-nav">
+      <div class="fg"><div class="fg-header"><span class="fg-title">Video Archive Teaser</span></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Headline</span><span class="fl-key">home_video_headline</span></div><div class="fi-col"><textarea class="fi" data-key="home_video_headline" rows="2"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Video 1 Tag</span><span class="fl-hint">Role · City, State</span><span class="fl-key">home_vid1_tag</span></div><div class="fi-col"><textarea class="fi" data-key="home_vid1_tag" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Video 2 Tag</span><span class="fl-key">home_vid2_tag</span></div><div class="fi-col"><textarea class="fi" data-key="home_vid2_tag" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Video 3 Tag</span><span class="fl-key">home_vid3_tag</span></div><div class="fi-col"><textarea class="fi" data-key="home_vid3_tag" rows="1"></textarea></div></div>
       </div>
     </div>
 
-    <!-- ===== STEPS ===== -->
-    <div id="section-steps" class="section-nav">
-      <div class="field-group">
-        <div class="field-group-header">
-          <span class="field-group-title">In-Person Response — 7 Steps</span>
-          <span class="field-group-desc">Select a step below to edit its content</span>
-        </div>
-        <div class="step-selector" id="step-selector">
-          <button class="step-select-btn active" onclick="showStep(0, this)">Step 1</button>
-          <button class="step-select-btn" onclick="showStep(1, this)">Step 2</button>
-          <button class="step-select-btn" onclick="showStep(2, this)">Step 3</button>
-          <button class="step-select-btn" onclick="showStep(3, this)">Step 4</button>
-          <button class="step-select-btn" onclick="showStep(4, this)">Step 5</button>
-          <button class="step-select-btn" onclick="showStep(5, this)">Step 6</button>
-          <button class="step-select-btn" onclick="showStep(6, this)">Step 7</button>
-        </div>
-        <div id="step-fields" style="padding: 16px 0 0;"></div>
+    <div id="sec-home_misc" class="section-nav">
+      <div class="fg"><div class="fg-header"><span class="fg-title">Section Header</span></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Section Label</span><span class="fl-key">home_misc_label</span></div><div class="fi-col"><textarea class="fi" data-key="home_misc_label" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Section Heading</span><span class="fl-key">home_misc_title</span></div><div class="fi-col"><textarea class="fi" data-key="home_misc_title" rows="1"></textarea></div></div>
+      </div>
+      <div class="fg"><div class="fg-header"><span class="fg-title">Left Column — Clickable Truths</span><span class="fg-desc">Always visible</span></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Truth 1</span><span class="fl-key">misc_truth_0</span></div><div class="fi-col"><textarea class="fi" data-key="misc_truth_0" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Truth 2</span><span class="fl-key">misc_truth_1</span></div><div class="fi-col"><textarea class="fi" data-key="misc_truth_1" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Truth 3</span><span class="fl-key">misc_truth_2</span></div><div class="fi-col"><textarea class="fi" data-key="misc_truth_2" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Truth 4</span><span class="fl-key">misc_truth_3</span></div><div class="fi-col"><textarea class="fi" data-key="misc_truth_3" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Truth 5</span><span class="fl-key">misc_truth_4</span></div><div class="fi-col"><textarea class="fi" data-key="misc_truth_4" rows="1"></textarea></div></div>
+      </div>
+      <div class="fg"><div class="fg-header"><span class="fg-title">Right Panel — Detail Content</span><span class="fg-desc">Populates when a truth is clicked</span></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Detail 1 — Label</span><span class="fl-hint">e.g. "On Safety"</span><span class="fl-key">misc_label_0</span></div><div class="fi-col"><textarea class="fi" data-key="misc_label_0" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Detail 1 — Heading</span><span class="fl-key">misc_h3_0</span></div><div class="fi-col"><textarea class="fi" data-key="misc_h3_0" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Detail 1 — Body</span><span class="fl-key">misc_body_0</span></div><div class="fi-col"><textarea class="fi" data-key="misc_body_0" rows="4"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Detail 2 — Label</span><span class="fl-key">misc_label_1</span></div><div class="fi-col"><textarea class="fi" data-key="misc_label_1" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Detail 2 — Heading</span><span class="fl-key">misc_h3_1</span></div><div class="fi-col"><textarea class="fi" data-key="misc_h3_1" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Detail 2 — Body</span><span class="fl-key">misc_body_1</span></div><div class="fi-col"><textarea class="fi" data-key="misc_body_1" rows="4"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Detail 3 — Label</span><span class="fl-key">misc_label_2</span></div><div class="fi-col"><textarea class="fi" data-key="misc_label_2" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Detail 3 — Heading</span><span class="fl-key">misc_h3_2</span></div><div class="fi-col"><textarea class="fi" data-key="misc_h3_2" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Detail 3 — Body</span><span class="fl-key">misc_body_2</span></div><div class="fi-col"><textarea class="fi" data-key="misc_body_2" rows="4"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Detail 4 — Label</span><span class="fl-key">misc_label_3</span></div><div class="fi-col"><textarea class="fi" data-key="misc_label_3" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Detail 4 — Heading</span><span class="fl-key">misc_h3_3</span></div><div class="fi-col"><textarea class="fi" data-key="misc_h3_3" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Detail 4 — Body</span><span class="fl-key">misc_body_3</span></div><div class="fi-col"><textarea class="fi" data-key="misc_body_3" rows="4"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Detail 5 — Label</span><span class="fl-key">misc_label_4</span></div><div class="fi-col"><textarea class="fi" data-key="misc_label_4" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Detail 5 — Heading</span><span class="fl-key">misc_h3_4</span></div><div class="fi-col"><textarea class="fi" data-key="misc_h3_4" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Detail 5 — Body</span><span class="fl-key">misc_body_4</span></div><div class="fi-col"><textarea class="fi" data-key="misc_body_4" rows="4"></textarea></div></div>
       </div>
     </div>
 
-    <!-- ===== RESPONDERS ===== -->
-    <div id="section-responders" class="section-nav">
-      <div class="field-group">
-        <div class="field-group-header">
-          <span class="field-group-title">Responders Page</span>
-        </div>
-        <div class="field-row">
-          <div class="field-label-col"><span class="field-label">Page Title</span><span class="field-key">resp_archive_title</span></div>
-          <div class="field-input-col"><textarea class="field-input" data-key="resp_archive_title" rows="1">Meet the Responders</textarea></div>
-        </div>
+    <div id="sec-home_map" class="section-nav">
+      <div class="fg"><div class="fg-header"><span class="fg-title">Map + Stats Section</span></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Section Label</span><span class="fl-key">home_map_label</span></div><div class="fi-col"><textarea class="fi" data-key="home_map_label" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Headline</span><span class="fl-key">home_map_headline</span></div><div class="fi-col"><textarea class="fi" data-key="home_map_headline" rows="2"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Body Text</span><span class="fl-key">home_map_body</span></div><div class="fi-col"><textarea class="fi" data-key="home_map_body" rows="2"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Stat 1</span><span class="fl-hint">e.g. "130+ Programs"</span><span class="fl-key">home_map_stat1</span></div><div class="fi-col"><textarea class="fi" data-key="home_map_stat1" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Stat 2</span><span class="fl-hint">e.g. "All 50 States"</span><span class="fl-key">home_map_stat2</span></div><div class="fi-col"><textarea class="fi" data-key="home_map_stat2" rows="1"></textarea></div></div>
       </div>
     </div>
 
-    <!-- ===== EVIDENCE ===== -->
-    <div id="section-evidence" class="section-nav">
-      <div class="field-group">
-        <div class="field-group-header">
-          <span class="field-group-title">Evidence Page</span>
-        </div>
-        <div class="field-row">
-          <div class="field-label-col"><span class="field-label">Page Title</span><span class="field-key">ev_hero_title</span></div>
-          <div class="field-input-col"><textarea class="field-input" data-key="ev_hero_title" rows="1">The Evidence Is Clear</textarea></div>
-        </div>
-        <div class="field-row">
-          <div class="field-label-col"><span class="field-label">Findings Headline</span><span class="field-key">ev_findings_headline</span></div>
-          <div class="field-input-col"><textarea class="field-input" data-key="ev_findings_headline" rows="1">The findings point in the same direction</textarea></div>
-        </div>
-      </div>
-      <div class="field-group">
-        <div class="field-group-header">
-          <span class="field-group-title">Finding Cards</span>
-          <span class="field-group-desc">Four key findings shown at top of Evidence page</span>
-        </div>
-        <div class="field-row">
-          <div class="field-label-col"><span class="field-label">Finding 1 — Title</span><span class="field-hint">Short italic headline</span><span class="field-key">finding_safe_title</span></div>
-          <div class="field-input-col"><textarea class="field-input" data-key="finding_safe_title" rows="1">It's safe.</textarea></div>
-        </div>
-        <div class="field-row">
-          <div class="field-label-col"><span class="field-label">Finding 2 — Title</span><span class="field-key">finding_works_title</span></div>
-          <div class="field-input-col"><textarea class="field-input" data-key="finding_works_title" rows="1">It works.</textarea></div>
-        </div>
-        <div class="field-row">
-          <div class="field-label-col"><span class="field-label">Finding 3 — Title</span><span class="field-key">finding_money_title</span></div>
-          <div class="field-input-col"><textarea class="field-input" data-key="finding_money_title" rows="1">It saves money.</textarea></div>
-        </div>
-        <div class="field-row">
-          <div class="field-label-col"><span class="field-label">Finding 4 — Title</span><span class="field-key">finding_police_title</span></div>
-          <div class="field-input-col"><textarea class="field-input" data-key="finding_police_title" rows="1">Police support it.</textarea></div>
-        </div>
+    <div id="sec-home_news" class="section-nav">
+      <div class="fg"><div class="fg-header"><span class="fg-title">In the News</span><span class="fg-desc">4 news items</span></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Section Label</span><span class="fl-key">home_news_label</span></div><div class="fi-col"><textarea class="fi" data-key="home_news_label" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Item 1 — Outlet</span><span class="fl-key">news_outlet_1</span></div><div class="fi-col"><textarea class="fi" data-key="news_outlet_1" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Item 1 — Headline</span><span class="fl-key">news_headline_1</span></div><div class="fi-col"><textarea class="fi" data-key="news_headline_1" rows="2"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Item 2 — Outlet</span><span class="fl-key">news_outlet_2</span></div><div class="fi-col"><textarea class="fi" data-key="news_outlet_2" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Item 2 — Headline</span><span class="fl-key">news_headline_2</span></div><div class="fi-col"><textarea class="fi" data-key="news_headline_2" rows="2"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Item 3 — Outlet</span><span class="fl-key">news_outlet_3</span></div><div class="fi-col"><textarea class="fi" data-key="news_outlet_3" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Item 3 — Headline</span><span class="fl-key">news_headline_3</span></div><div class="fi-col"><textarea class="fi" data-key="news_headline_3" rows="2"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Item 4 — Outlet</span><span class="fl-key">news_outlet_4</span></div><div class="fi-col"><textarea class="fi" data-key="news_outlet_4" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Item 4 — Headline</span><span class="fl-key">news_headline_4</span></div><div class="fi-col"><textarea class="fi" data-key="news_headline_4" rows="2"></textarea></div></div>
       </div>
     </div>
 
-    <!-- ===== ABOUT ===== -->
-    <div id="section-about" class="section-nav">
-      <div class="field-group">
-        <div class="field-group-header"><span class="field-group-title">About Page</span></div>
-        <div class="field-row">
-          <div class="field-label-col"><span class="field-label">Page Title</span><span class="field-key">about_hero_title</span></div>
-          <div class="field-input-col"><textarea class="field-input" data-key="about_hero_title" rows="1">About This Project</textarea></div>
-        </div>
-        <div class="field-row">
-          <div class="field-label-col"><span class="field-label">Why This Moment — Title</span><span class="field-key">about_why_title</span></div>
-          <div class="field-input-col"><textarea class="field-input" data-key="about_why_title" rows="1">Why This Moment Matters</textarea></div>
-        </div>
-        <div class="field-row">
-          <div class="field-label-col"><span class="field-label">Pull Quote</span><span class="field-hint">Large italic statement in right column</span><span class="field-key">about_pull_quote</span></div>
-          <div class="field-input-col"><textarea class="field-input" data-key="about_pull_quote" rows="3">The gap isn't evidence. The gap is awareness, imagination, and political will.</textarea></div>
-        </div>
+    <div id="sec-home_end" class="section-nav">
+      <div class="fg"><div class="fg-header"><span class="fg-title">End of Page Block</span></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Headline</span><span class="fl-key">home_end_headline</span></div><div class="fi-col"><textarea class="fi" data-key="home_end_headline" rows="3"></textarea></div></div>
       </div>
     </div>
 
-    <!-- ===== GET INVOLVED ===== -->
-    <div id="section-gi" class="section-nav">
-      <div class="field-group">
-        <div class="field-group-header"><span class="field-group-title">Get Involved Page</span></div>
-        <div class="field-row">
-          <div class="field-label-col"><span class="field-label">Page Title</span><span class="field-key">gi_hero_title</span></div>
-          <div class="field-input-col"><textarea class="field-input" data-key="gi_hero_title" rows="1">Get Involved</textarea></div>
-        </div>
+    <div id="sec-resp_intro" class="section-nav">
+      <div class="fg"><div class="fg-header"><span class="fg-title">Response Page — Intro</span></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Page Title</span><span class="fl-key">resp_hero_title</span></div><div class="fi-col"><textarea class="fi" data-key="resp_hero_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Intro Paragraph</span><span class="fl-key">resp_hero_body</span></div><div class="fi-col"><textarea class="fi" data-key="resp_hero_body" rows="3"></textarea></div></div>
       </div>
     </div>
 
-  </div><!-- /editor-body -->
+    <div id="sec-resp_c1" class="section-nav">
+      <div class="fg"><div class="fg-header"><span class="fg-title">Pre-Response Diversion</span><span class="fg-desc">Component 01</span></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Stage Label</span><span class="fl-key">resp_c1_label</span></div><div class="fi-col"><textarea class="fi" data-key="resp_c1_label" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Title</span><span class="fl-key">resp_c1_title</span></div><div class="fi-col"><textarea class="fi" data-key="resp_c1_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Subtitle</span><span class="fl-key">resp_c1_sub</span></div><div class="fi-col"><textarea class="fi" data-key="resp_c1_sub" rows="2"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Body</span><span class="fl-key">resp_c1_body</span></div><div class="fi-col"><textarea class="fi" data-key="resp_c1_body" rows="3"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Bullet 1</span><span class="fl-hint">Text after "Online reporting"</span><span class="fl-key">resp_c1_bullet1</span></div><div class="fi-col"><textarea class="fi" data-key="resp_c1_bullet1" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Bullet 2</span><span class="fl-hint">Text after "Emergency clinical support"</span><span class="fl-key">resp_c1_bullet2</span></div><div class="fi-col"><textarea class="fi" data-key="resp_c1_bullet2" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Bullet 3</span><span class="fl-hint">Text after "Mandatory alarm verification"</span><span class="fl-key">resp_c1_bullet3</span></div><div class="fi-col"><textarea class="fi" data-key="resp_c1_bullet3" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Bullet 4</span><span class="fl-hint">Text after "Medical director oversight"</span><span class="fl-key">resp_c1_bullet4</span></div><div class="fi-col"><textarea class="fi" data-key="resp_c1_bullet4" rows="1"></textarea></div></div>
+      </div>
+      <div class="fg"><div class="fg-header"><span class="fg-title">Component 02 Header</span><span class="fg-desc">Intro to the 7-step section</span></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Stage Label</span><span class="fl-key">resp_c2_label</span></div><div class="fi-col"><textarea class="fi" data-key="resp_c2_label" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Title</span><span class="fl-key">resp_c2_title</span></div><div class="fi-col"><textarea class="fi" data-key="resp_c2_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Subtitle</span><span class="fl-key">resp_c2_sub</span></div><div class="fi-col"><textarea class="fi" data-key="resp_c2_sub" rows="2"></textarea></div></div>
+      </div>
+    </div>
+
+    <div id="sec-resp_steps" class="section-nav">
+      <div class="fg"><div class="fg-header"><span class="fg-title">In-Person Response — 7 Steps</span><span class="fg-desc">Select a step to edit</span></div>
+        <div class="step-tabs" id="step-tabs">
+          <button class="step-tab active" onclick="showStep(0,this)">Step 1</button>
+          <button class="step-tab" onclick="showStep(1,this)">Step 2</button>
+          <button class="step-tab" onclick="showStep(2,this)">Step 3</button>
+          <button class="step-tab" onclick="showStep(3,this)">Step 4</button>
+          <button class="step-tab" onclick="showStep(4,this)">Step 5</button>
+          <button class="step-tab" onclick="showStep(5,this)">Step 6</button>
+          <button class="step-tab" onclick="showStep(6,this)">Step 7</button>
+        </div>
+        <div id="step-fields"></div>
+      </div>
+    </div>
+
+    <div id="sec-resp_c3" class="section-nav">
+      <div class="fg"><div class="fg-header"><span class="fg-title">Alternate Destinations</span><span class="fg-desc">Component 03</span></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Stage Label</span><span class="fl-key">resp_c3_label</span></div><div class="fi-col"><textarea class="fi" data-key="resp_c3_label" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Title</span><span class="fl-key">resp_c3_title</span></div><div class="fi-col"><textarea class="fi" data-key="resp_c3_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Subtitle</span><span class="fl-key">resp_c3_sub</span></div><div class="fi-col"><textarea class="fi" data-key="resp_c3_sub" rows="2"></textarea></div></div>
+      </div>
+      <div class="fg"><div class="fg-header"><span class="fg-title">Destination Cards</span><span class="fg-desc">6 destination types</span></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Card 1 — Title</span><span class="fl-key">dest1_title</span></div><div class="fi-col"><textarea class="fi" data-key="dest1_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Card 1 — Body</span><span class="fl-key">dest1_body</span></div><div class="fi-col"><textarea class="fi" data-key="dest1_body" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Card 2 — Title</span><span class="fl-key">dest2_title</span></div><div class="fi-col"><textarea class="fi" data-key="dest2_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Card 2 — Body</span><span class="fl-key">dest2_body</span></div><div class="fi-col"><textarea class="fi" data-key="dest2_body" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Card 3 — Title</span><span class="fl-key">dest3_title</span></div><div class="fi-col"><textarea class="fi" data-key="dest3_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Card 3 — Body</span><span class="fl-key">dest3_body</span></div><div class="fi-col"><textarea class="fi" data-key="dest3_body" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Card 4 — Title</span><span class="fl-key">dest4_title</span></div><div class="fi-col"><textarea class="fi" data-key="dest4_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Card 4 — Body</span><span class="fl-key">dest4_body</span></div><div class="fi-col"><textarea class="fi" data-key="dest4_body" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Card 5 — Title</span><span class="fl-key">dest5_title</span></div><div class="fi-col"><textarea class="fi" data-key="dest5_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Card 5 — Body</span><span class="fl-key">dest5_body</span></div><div class="fi-col"><textarea class="fi" data-key="dest5_body" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Card 6 — Title</span><span class="fl-key">dest6_title</span></div><div class="fi-col"><textarea class="fi" data-key="dest6_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Card 6 — Body</span><span class="fl-key">dest6_body</span></div><div class="fi-col"><textarea class="fi" data-key="dest6_body" rows="1"></textarea></div></div>
+      </div>
+    </div>
+
+    <div id="sec-resp_c4" class="section-nav">
+      <div class="fg"><div class="fg-header"><span class="fg-title">Second Response</span><span class="fg-desc">Component 04</span></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Stage Label</span><span class="fl-key">resp_c4_label</span></div><div class="fi-col"><textarea class="fi" data-key="resp_c4_label" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Title</span><span class="fl-key">resp_c4_title</span></div><div class="fi-col"><textarea class="fi" data-key="resp_c4_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Subtitle</span><span class="fl-key">resp_c4_sub</span></div><div class="fi-col"><textarea class="fi" data-key="resp_c4_sub" rows="2"></textarea></div></div>
+      </div>
+    </div>
+
+    <div id="sec-responders" class="section-nav">
+      <div class="fg"><div class="fg-header"><span class="fg-title">Responders Page</span></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Eyebrow</span><span class="fl-key">resp_eyebrow</span></div><div class="fi-col"><textarea class="fi" data-key="resp_eyebrow" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Page Title</span><span class="fl-key">resp_archive_title</span></div><div class="fi-col"><textarea class="fi" data-key="resp_archive_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Body Text</span><span class="fl-key">resp_archive_body</span></div><div class="fi-col"><textarea class="fi" data-key="resp_archive_body" rows="3"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">"More Coming" Label</span><span class="fl-key">resp_more_label</span></div><div class="fi-col"><textarea class="fi" data-key="resp_more_label" rows="1"></textarea></div></div>
+      </div>
+    </div>
+
+    <div id="sec-evidence" class="section-nav">
+      <div class="fg"><div class="fg-header"><span class="fg-title">Evidence Page — Intro</span></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Page Title</span><span class="fl-key">ev_hero_title</span></div><div class="fi-col"><textarea class="fi" data-key="ev_hero_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Body Text</span><span class="fl-key">ev_hero_body</span></div><div class="fi-col"><textarea class="fi" data-key="ev_hero_body" rows="2"></textarea></div></div>
+      </div>
+      <div class="fg"><div class="fg-header"><span class="fg-title">Key Findings</span></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Section Heading</span><span class="fl-key">ev_findings_headline</span></div><div class="fi-col"><textarea class="fi" data-key="ev_findings_headline" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Finding 1 — Title</span><span class="fl-key">finding_safe_title</span></div><div class="fi-col"><textarea class="fi" data-key="finding_safe_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Finding 1 — Body</span><span class="fl-key">finding_safe_body</span></div><div class="fi-col"><textarea class="fi" data-key="finding_safe_body" rows="3"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Finding 2 — Title</span><span class="fl-key">finding_works_title</span></div><div class="fi-col"><textarea class="fi" data-key="finding_works_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Finding 2 — Body</span><span class="fl-key">finding_works_body</span></div><div class="fi-col"><textarea class="fi" data-key="finding_works_body" rows="3"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Finding 3 — Title</span><span class="fl-key">finding_money_title</span></div><div class="fi-col"><textarea class="fi" data-key="finding_money_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Finding 3 — Body</span><span class="fl-key">finding_money_body</span></div><div class="fi-col"><textarea class="fi" data-key="finding_money_body" rows="3"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Finding 4 — Title</span><span class="fl-key">finding_police_title</span></div><div class="fi-col"><textarea class="fi" data-key="finding_police_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Finding 4 — Body</span><span class="fl-key">finding_police_body</span></div><div class="fi-col"><textarea class="fi" data-key="finding_police_body" rows="3"></textarea></div></div>
+      </div>
+      <div class="fg"><div class="fg-header"><span class="fg-title">Numbers Band</span></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Stat 1 — Number</span><span class="fl-key">stat1_num</span></div><div class="fi-col"><textarea class="fi" data-key="stat1_num" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Stat 1 — Label</span><span class="fl-key">stat1_label</span></div><div class="fi-col"><textarea class="fi" data-key="stat1_label" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Stat 2 — Number</span><span class="fl-key">stat2_num</span></div><div class="fi-col"><textarea class="fi" data-key="stat2_num" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Stat 2 — Label</span><span class="fl-key">stat2_label</span></div><div class="fi-col"><textarea class="fi" data-key="stat2_label" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Stat 3 — Number</span><span class="fl-key">stat3_num</span></div><div class="fi-col"><textarea class="fi" data-key="stat3_num" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Stat 3 — Label</span><span class="fl-key">stat3_label</span></div><div class="fi-col"><textarea class="fi" data-key="stat3_label" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Stat 4 — Number</span><span class="fl-key">stat4_num</span></div><div class="fi-col"><textarea class="fi" data-key="stat4_num" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Stat 4 — Label</span><span class="fl-key">stat4_label</span></div><div class="fi-col"><textarea class="fi" data-key="stat4_label" rows="2"></textarea></div></div>
+      </div>
+      <div class="fg"><div class="fg-header"><span class="fg-title">National Map</span></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Title</span><span class="fl-key">ev_map_title</span></div><div class="fi-col"><textarea class="fi" data-key="ev_map_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Body</span><span class="fl-key">ev_map_body</span></div><div class="fi-col"><textarea class="fi" data-key="ev_map_body" rows="2"></textarea></div></div>
+      </div>
+      <div class="fg"><div class="fg-header"><span class="fg-title">Research Database</span></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Section Title</span><span class="fl-key">ev_reports_title</span></div><div class="fi-col"><textarea class="fi" data-key="ev_reports_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Section Body</span><span class="fl-key">ev_reports_body</span></div><div class="fi-col"><textarea class="fi" data-key="ev_reports_body" rows="2"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Report 1 — Title</span><span class="fl-key">report1_title</span></div><div class="fi-col"><textarea class="fi" data-key="report1_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Report 1 — Meta</span><span class="fl-hint">Author · Year</span><span class="fl-key">report1_meta</span></div><div class="fi-col"><textarea class="fi" data-key="report1_meta" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Report 2 — Title</span><span class="fl-key">report2_title</span></div><div class="fi-col"><textarea class="fi" data-key="report2_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Report 2 — Meta</span><span class="fl-key">report2_meta</span></div><div class="fi-col"><textarea class="fi" data-key="report2_meta" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Report 3 — Title</span><span class="fl-key">report3_title</span></div><div class="fi-col"><textarea class="fi" data-key="report3_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Report 3 — Meta</span><span class="fl-key">report3_meta</span></div><div class="fi-col"><textarea class="fi" data-key="report3_meta" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Report 4 — Title</span><span class="fl-key">report4_title</span></div><div class="fi-col"><textarea class="fi" data-key="report4_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Report 4 — Meta</span><span class="fl-key">report4_meta</span></div><div class="fi-col"><textarea class="fi" data-key="report4_meta" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Report 5 — Title</span><span class="fl-key">report5_title</span></div><div class="fi-col"><textarea class="fi" data-key="report5_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Report 5 — Meta</span><span class="fl-key">report5_meta</span></div><div class="fi-col"><textarea class="fi" data-key="report5_meta" rows="1"></textarea></div></div>
+      </div>
+    </div>
+
+    <div id="sec-about" class="section-nav">
+      <div class="fg"><div class="fg-header"><span class="fg-title">Page Intro</span></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Page Title</span><span class="fl-key">about_hero_title</span></div><div class="fi-col"><textarea class="fi" data-key="about_hero_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Intro Body</span><span class="fl-key">about_hero_body</span></div><div class="fi-col"><textarea class="fi" data-key="about_hero_body" rows="3"></textarea></div></div>
+      </div>
+      <div class="fg"><div class="fg-header"><span class="fg-title">Why This Moment</span></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Section Heading</span><span class="fl-key">about_why_title</span></div><div class="fi-col"><textarea class="fi" data-key="about_why_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Paragraph 1</span><span class="fl-key">about_why_body1</span></div><div class="fi-col"><textarea class="fi" data-key="about_why_body1" rows="3"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Paragraph 2</span><span class="fl-key">about_why_body2</span></div><div class="fi-col"><textarea class="fi" data-key="about_why_body2" rows="2"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Paragraph 3</span><span class="fl-key">about_why_body3</span></div><div class="fi-col"><textarea class="fi" data-key="about_why_body3" rows="2"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Pull Quote</span><span class="fl-hint">Large italic in sidebar</span><span class="fl-key">about_pull_quote</span></div><div class="fi-col"><textarea class="fi" data-key="about_pull_quote" rows="2"></textarea></div></div>
+      </div>
+      <div class="fg"><div class="fg-header"><span class="fg-title">Project Stewardship</span></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Section Label</span><span class="fl-key">about_partner_label</span></div><div class="fi-col"><textarea class="fi" data-key="about_partner_label" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Section Title</span><span class="fl-key">about_partner_title</span></div><div class="fi-col"><textarea class="fi" data-key="about_partner_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Partner Name</span><span class="fl-key">about_partner_name</span></div><div class="fi-col"><textarea class="fi" data-key="about_partner_name" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Partner Body</span><span class="fl-key">about_partner_body</span></div><div class="fi-col"><textarea class="fi" data-key="about_partner_body" rows="4"></textarea></div></div>
+      </div>
+      <div class="fg"><div class="fg-header"><span class="fg-title">How We Tell This Story</span></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Section Label</span><span class="fl-key">about_how_label</span></div><div class="fi-col"><textarea class="fi" data-key="about_how_label" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Section Title</span><span class="fl-key">about_how_title</span></div><div class="fi-col"><textarea class="fi" data-key="about_how_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Paragraph 1</span><span class="fl-key">about_how_body1</span></div><div class="fi-col"><textarea class="fi" data-key="about_how_body1" rows="2"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Paragraph 2</span><span class="fl-key">about_how_body2</span></div><div class="fi-col"><textarea class="fi" data-key="about_how_body2" rows="2"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Paragraph 3</span><span class="fl-key">about_how_body3</span></div><div class="fi-col"><textarea class="fi" data-key="about_how_body3" rows="2"></textarea></div></div>
+      </div>
+      <div class="fg"><div class="fg-header"><span class="fg-title">Our Values</span></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Section Label</span><span class="fl-key">about_values_label</span></div><div class="fi-col"><textarea class="fi" data-key="about_values_label" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Section Title</span><span class="fl-key">about_values_title</span></div><div class="fi-col"><textarea class="fi" data-key="about_values_title" rows="1"></textarea></div></div>
+      </div>
+    </div>
+
+    <div id="sec-gi" class="section-nav">
+      <div class="fg"><div class="fg-header"><span class="fg-title">Page Intro</span></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Page Title</span><span class="fl-key">gi_hero_title</span></div><div class="fi-col"><textarea class="fi" data-key="gi_hero_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Intro Body</span><span class="fl-key">gi_hero_body</span></div><div class="fi-col"><textarea class="fi" data-key="gi_hero_body" rows="2"></textarea></div></div>
+      </div>
+      <div class="fg"><div class="fg-header"><span class="fg-title">Audience Card Titles</span></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Audience 1</span><span class="fl-key">aud1_title</span></div><div class="fi-col"><textarea class="fi" data-key="aud1_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Audience 2</span><span class="fl-key">aud2_title</span></div><div class="fi-col"><textarea class="fi" data-key="aud2_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Audience 3</span><span class="fl-key">aud3_title</span></div><div class="fi-col"><textarea class="fi" data-key="aud3_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Audience 4</span><span class="fl-key">aud4_title</span></div><div class="fi-col"><textarea class="fi" data-key="aud4_title" rows="1"></textarea></div></div>
+      </div>
+      <div class="fg"><div class="fg-header"><span class="fg-title">Contact Section</span></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Title</span><span class="fl-key">gi_contact_title</span></div><div class="fi-col"><textarea class="fi" data-key="gi_contact_title" rows="1"></textarea></div></div>
+        <div class="fr"><div class="fl"><span class="fl-label">Body</span><span class="fl-key">gi_contact_body</span></div><div class="fi-col"><textarea class="fi" data-key="gi_contact_body" rows="2"></textarea></div></div>
+      </div>
+    </div>
+
+  </div>
 </main>
-
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script>
-// ===================== CONTENT MODEL =====================
-// Default content — mirrors what's in index.html
-const DEFAULTS = {
-  home_hero_eyebrow: 'Safe First Response',
-  home_hero_headline: 'Police receive over 240 million<br><em>911 calls</em> each year.',
-  home_hero_sub: "What if even a small share were routed to responders trained to meet people's actual needs?",
-  home_intro_label: 'What is Safe First Response?',
-  home_intro_body: "In cities and towns across the country, trained responders are handling 911 calls that do not require police. These unarmed safety responders address concerns involving mental health, substance use, disputes, and welfare checks — resolving issues with care, reducing harm, and improving public safety.",
-  home_video_headline: "Hear directly from the people doing this work —<br>in their own words.",
-  home_map_headline: "What patterns emerge when millions of calls are handled differently?",
-  home_end_headline: "This project is led by the Policing Project in partnership with practitioners, researchers, and communities across the country.",
+const DEFAULTS={home_hero_eyebrow:'Safe First Response',home_hero_headline:'Police receive over 240 million<br><em>911 calls</em> each year.',home_hero_sub:"What if even a small share were routed to responders trained to meet people's actual needs?",home_intro_label:'What is Safe First Response?',home_intro_body:"In cities and towns across the country, trained responders are handling 911 calls that do not require police. These unarmed safety responders address concerns involving mental health, substance use, disputes, and welfare checks — resolving issues with care, reducing harm, and improving public safety.",home_video_headline:"Hear directly from the people doing this work —<br>in their own words.",home_vid1_tag:'Clinician · Minneapolis, MN',home_vid2_tag:'Peer Specialist · Denver, CO',home_vid3_tag:'Outreach Specialist · Durham, NC',home_misc_label:'Common questions, plain answers',home_misc_title:'Addressing the doubts',misc_truth_0:'Unarmed response dramatically reduces escalation',misc_truth_1:'Responders are trained professionals',misc_truth_2:'Safe First Response saves public dollars',misc_truth_3:'These models work in cities and rural communities',misc_truth_4:'This strengthens — not weakens — public safety',misc_label_0:'On Safety',misc_label_1:'On Professionalism',misc_label_2:'On Cost',misc_label_3:'On Universality',misc_label_4:'On Public Safety',misc_h3_0:'Unarmed response dramatically reduces escalation',misc_h3_1:'Responders are trained professionals',misc_h3_2:'Safe First Response saves public dollars',misc_h3_3:'These models work in cities and rural communities',misc_h3_4:'This strengthens — not weakens — public safety',misc_body_0:"Across programs nationwide, unarmed responders resolve the vast majority of calls without force, arrest, or injury. By arriving without weapons and prioritizing communication, de-escalation, and clinical assessment, responders reduce fear and volatility at the outset of an interaction. This approach lowers the risk of harm for community members, responders, and law enforcement alike — and helps prevent situations from escalating into crises that require police involvement.",misc_body_1:"AFR responders are trained, certified, and dispatched directly from 911. They bring clinical expertise, lived experience, trauma-informed skills, and cultural knowledge. Many programs use marked vehicles and uniforms. When they arrive, people know that help — real, professional help — has come.",misc_body_2:"The cost per response is significantly lower than a traditional police response to the same type of call. Programs reduce strain on emergency rooms, police departments, and the court system. Studies of programs like Denver's STAR show meaningful cost savings per call — producing measurable returns across the entire public safety ecosystem.",misc_body_3:"Every community faces the same underlying concerns: untreated mental health needs, interpersonal disputes, welfare checks, and more. Programs are already operating in small towns and rural counties. Some use phone or virtual response where rapid in-person response isn't feasible. The model is tailored to local context — the need is universal.",misc_body_4:"Safe First Response reduces inappropriate call volume so that police can focus on situations that genuinely require them. Law enforcement officers across the country report that these programs make their jobs easier, safer, and more effective. This isn't a competition. It's a collaboration — a smarter, fuller approach to keeping communities safe.",home_map_label:'National Patterns',home_map_headline:'What patterns emerge when millions of calls are handled differently?',home_map_body:"Programs are launching across the country — in small towns and major cities. The data shows what's possible when we match response to need.",home_map_stat1:'130+ Programs',home_map_stat2:'All 50 States',home_news_label:'In the news',news_outlet_1:'The New York Times',news_headline_1:'"These Cities Are Sending Mental Health Workers, Not Police, to Some 911 Calls"',news_outlet_2:'Washington Post',news_headline_2:"\"Denver's alternative response program cut costs and kept people out of jail\"",news_outlet_3:'NPR',news_headline_3:'"Cities Look Beyond Police For Public Safety Solutions That Actually Stick"',news_outlet_4:'Governing',news_headline_4:'"What the Evidence Says About Alternative Response"',home_end_headline:'This project is led by the Policing Project in partnership with practitioners, researchers, and communities across the country.',resp_hero_title:'How Safe First Response Works',resp_hero_body:"When someone needs help, what happens next matters enormously. Safe First Response is built on a simple idea: get the right person to every call, with the right skills, for the right outcome. Here's what that looks like — from the first 911 call to the last follow-up.",resp_c1_label:'Before anyone is dispatched',resp_c1_title:'Pre-Response Diversion',resp_c1_sub:"Many concerns can be resolved before a responder ever leaves the station.",resp_c1_body:'Not every call to 911 needs an in-person response. A well-designed system can resolve many concerns immediately — by phone, online, or through triage.',resp_c1_bullet1:'for non-urgent concerns — noise, minor incidents, follow-ups.',resp_c1_bullet2:'for people in distress.',resp_c1_bullet3:'before anyone is dispatched.',resp_c1_bullet4:'for mental health and substance use triage.',resp_c2_label:'The right responder arrives',resp_c2_title:'In-Person Response',resp_c2_sub:'Seven stages. Each one a window into what trained, unarmed response looks like in practice. Click any stage to go deeper.',step1_title:'A concern, not a crime',step1_hero_title:'A concern, not a crime',step1_hero_caption:"Someone needs help. Before anything else can go right, this distinction has to be made — by the dispatcher, the responder, and the system itself.",step1_narr_label1:'Setting the scene',step1_narr_label2:'What research tells us',step1_quote:'"Most of what we respond to, nobody needed police. They needed somebody."',step1_attribution:'— CAHOOTS Responder, Eugene, OR',step1_spread_body:"CAHOOTS — Crisis Assistance Helping Out On The Streets — has been operating in Eugene, Oregon since 1989. In more than three decades, their mobile crisis intervention teams have handled over 17% of Eugene's 911 call volume.",step1_prog_stat:'17%',step1_prog_stat_label:"of Eugene's 911 call volume handled without police",step1_prog_quote:'"We go to the people who are in the most need, in the most vulnerable moments of their lives."',step2_title:'Triage at 911',step2_hero_title:'Triage at 911',step2_hero_caption:"The dispatcher's decision — made in seconds — determines who arrives. It is the invisible architecture of the entire system.",step2_narr_label1:'The protocol',step2_narr_label2:'Designing the system',step2_quote:'"We trained side by side with dispatch. They know us, they trust us. That trust is the whole system."',step2_attribution:'— STAR Program Coordinator, Denver, CO',step2_spread_body:"The triage protocol isn't just a checklist — it's a relationship. Dispatchers who work alongside AFR teams develop pattern recognition over time.",step2_prog_stat:'0',step2_prog_stat_label:'Police backup calls required on 2,400+ STAR responses',step2_prog_quote:"\"The dispatcher's confidence is the foundation. Without it, nothing else works.\"",step3_title:'Initial assessment on arrival',step3_hero_title:'The first two minutes',step3_hero_caption:"The responder reads the scene before they've said a word. Everything that comes next depends on what they see — and how they choose to enter.",step3_narr_label1:'What the responder sees',step3_narr_label2:'The science of first contact',step3_quote:"\"I park half a block away sometimes. I want them to see me coming. I want them to see that I'm not rushing.\"",step3_attribution:'— Crisis Responder, HEART Program, Durham, NC',step3_spread_body:"Durham's HEART — Holistic Empathetic Assistance Response Team — trains responders in what they call \"the slow approach\": deliberate, visible, unhurried entry.",step3_prog_stat:'96%',step3_prog_stat_label:'of calls resolved without police assistance — placeholder, verify with program',step3_prog_quote:'"We designed the uniform together. Everything is intentional — from the color to the badge to what we carry."',step4_title:'Engagement',step4_hero_title:'The conversation that changes everything',step4_hero_caption:'The responder introduces themselves and begins building rapport. They are not there to establish compliance. They are there to help.',step4_narr_label1:'What engagement looks like',step4_narr_label2:'Trust as infrastructure',step4_quote:"\"I just sit with them. Sometimes for a long time. That's the work.\"",step4_attribution:'— Peer Specialist, CAHOOTS, Eugene, OR',step4_spread_body:"Peer specialists bring something no clinical credential can fully replicate: lived experience. When a responder can say, genuinely, \"I've been where you are\" — the dynamic of the conversation changes.",step4_prog_stat:'34yrs',step4_prog_stat_label:'of community-based crisis response — the longest-running program in the US',step4_prog_quote:'"The community knows us now. When people see the van, they wave."',step5_title:'De-escalation',step5_hero_title:'De-escalation is a clinical skill',step5_hero_caption:'Not a personality trait. Not a soft skill. A trained, validated methodology with measurable outcomes.',step5_narr_label1:'What de-escalation actually is',step5_narr_label2:'The outcomes data',step5_quote:"\"We don't wing it. Every technique I use, I was trained in. I practiced it. I know why it works.\"",step5_attribution:'— Crisis Clinician, ECCO Program, Austin, TX',step5_spread_body:"Austin's ECCO — Emergency Community Care Outreach — trains crisis clinicians in evidence-based methodologies. The clinical foundation isn't incidental to the model — it is the model.",step5_prog_stat:'0',step5_prog_stat_label:'Use-of-force incidents across all program responses — placeholder, verify',step5_prog_quote:'"They sent a clinician to a mental health call. And she resolved it. That\'s the whole argument."',step6_title:'Deeper assessment',step6_hero_title:'What does this person actually need?',step6_hero_caption:'Once calm is established, the real work begins: understanding not just what happened, but why — and what it will take to prevent it from happening again.',step6_narr_label1:'Beyond the immediate call',step6_narr_label2:'Whole-person assessment',step6_quote:"\"The call said welfare check. What I found was a man who hadn't eaten in three days, whose lights had been cut off, and who hadn't talked to anyone in a week.\"",step6_attribution:'— Outreach Specialist, Safe Streets, Minneapolis, MN',step6_spread_body:"Minneapolis's Safe Streets program places outreach workers with lived experience alongside clinical professionals. The assessment phase is often the longest part of a Safe Streets response. That time is the point.",step6_prog_stat:'Pilot',step6_prog_stat_label:'Launch city for this project · 2024–25',step6_prog_quote:'"We\'re not just closing the call. We\'re opening a relationship."',step7_title:'Resolution',step7_hero_title:'The concern is addressed.<br>The person is supported.',step7_hero_caption:"This is what success looks like. Not a log entry. Not a cleared call. A person who received the help they needed — from the right person, at the right time.",step7_narr_label1:'What resolution means',step7_narr_label2:'The evidence on outcomes',step7_quote:'"The call is closed, but I still think about him. I followed up. He got housed. That\'s why I do this work."',step7_attribution:'— Crisis Responder, STAR Program, Denver, CO',step7_spread_body:"Across every program in this archive, responders describe the same experience: the call that stayed with them. The one where the outcome wasn't just resolution — it was transformation.",step7_prog_stat:'85–95%',step7_prog_stat_label:'On-scene resolution rate across leading programs — verify with Policing Project',step7_prog_quote:'"Right responder. Right skillset. Right outcome."',resp_c3_label:'The right place, not just the nearest one',resp_c3_title:'Alternate Destinations',resp_c3_sub:"When someone needs more than on-scene support — there's somewhere to take them, other than an ER or a jail cell.",dest1_title:'Crisis Stabilization Centers',dest1_body:'Short-term mental health support without involuntary commitment.',dest2_title:'Sobering Centers',dest2_body:'Safe, supervised spaces for intoxication — diverting from ERs and jails.',dest3_title:'Triage Hubs',dest3_body:'Assessment centers connecting people to the right level of care.',dest4_title:'Psychiatric Urgent Care',dest4_body:'Same-day mental health care without emergency room wait times.',dest5_title:'Youth Drop-In Centers',dest5_body:'Safe spaces for young people in crisis.',dest6_title:'Community Providers',dest6_body:'Mental health, substance use, and social service organizations.',resp_c4_label:"The work doesn't end when the responder leaves",resp_c4_title:'Second Response',resp_c4_sub:"The most effective programs follow up. That's what turns a single response into lasting resolution.",resp_eyebrow:'First-Person. Unscripted. Real.',resp_archive_title:'Meet the Responders',resp_archive_body:'They are clinicians, peer specialists, outreach workers, crisis counselors, and community members. They are trained, professional, and unarmed. These are their stories, in their own words.',resp_more_label:'More Coming',ev_hero_title:'The Evidence Is Clear',ev_hero_body:"Safe First Response isn't a theory. It's a proven, already-working approach to public safety — with data, research, and results to back it up.",ev_findings_headline:'The findings point in the same direction',finding_safe_title:"It's safe.",finding_safe_body:'Programs report no injuries to responders over tens of thousands of responses. Unarmed responders produce dramatically lower use-of-force rates than police response for the same types of calls.',finding_works_title:'It works.',finding_works_body:'AFR programs consistently achieve high on-scene resolution rates, successful connection to services, and reduced repeat 911 calls for the same individuals.',finding_money_title:'It saves money.',finding_money_body:'Cost per AFR response is significantly lower than traditional police response — with measurable savings across emergency rooms, police departments, and the court system.',finding_police_title:'Police support it.',finding_police_body:'Law enforcement officers consistently report these programs make their jobs easier and more effective by reducing inappropriate call volume.',stat1_num:'130+',stat1_label:'Jurisdictions have launched AFR programs since 2020',stat2_num:'12M',stat2_label:"911 calls annually that don't require police response",stat3_num:'0',stat3_label:'Responder injuries across tens of thousands of responses in leading programs',stat4_num:'$X',stat4_label:'Cost savings per call vs. traditional police response (verify with Policing Project)',ev_map_title:"Where Programs Exist — and What They've Found",ev_map_body:'More than 130 jurisdictions have launched programs since 2020. This map shows where they are, what they look like, and what the data shows.',ev_reports_title:'Reports, Data, and Tools',ev_reports_body:"Research, program data, and policy tools from the Policing Project's national review and beyond.",report1_title:'The Denver STAR Program: Cost Analysis and Outcomes',report1_meta:'Dee & Pyne — Placeholder, verify citation · 2021',report2_title:'National Scoping Review of Alternative Response Programs',report2_meta:'The Policing Project — Placeholder, verify date',report3_title:'AFR Program Implementation Framework',report3_meta:'Placeholder — replace with actual Policing Project tools',report4_title:'Responder Safety: A Comparative Analysis',report4_meta:'Placeholder — verify source',report5_title:'Cost-Per-Response Comparison: AFR vs. Traditional Dispatch',report5_meta:'Placeholder — tie to ACS cost graphic when available',about_hero_title:'About This Project',about_hero_body:'The 12 Million Calls Initiative is a storytelling and advocacy project built to accelerate the adoption of Safe First Response programs nationwide — by making the case clearly, compellingly, and in the words of the people closest to the work.',about_why_title:'Why This Moment Matters',about_why_body1:'Programs that send trained, unarmed professionals to respond to non-violent concerns are working across the country. When people hear about them, they broadly support them. The research is clear. The results are documented.',about_why_body2:"And yet Safe First Response remains vastly underfunded — viewed by too many decision-makers as an interesting idea rather than a proven public safety solution.",about_why_body3:"The gap isn't evidence. The gap is awareness, imagination, and political will. This project exists to close that gap.",about_pull_quote:"The gap isn't evidence. The gap is awareness, imagination, and political will.",about_partner_label:'Project stewardship',about_partner_title:'Who Is Leading This Work',about_partner_name:'The Policing Project at NYU School of Law',about_partner_body:'The Policing Project works to make policing more democratic, equitable, and effective — through research, policy, and community engagement. Its national review of Alternative Response Programs is the most comprehensive assessment of AFR effectiveness to date. The Policing Project leads this initiative, stewards its research infrastructure, and connects programs, policymakers, and communities across the country.',about_how_label:'How we work',about_how_title:'How We Tell This Story',about_how_body1:'This project is built on a core belief: the most powerful advocates for Safe First Response are the people doing the work.',about_how_body2:"That's why the center of this initiative is a growing archive of first-person video — responders, program leaders, community partners, and law enforcement allies speaking in their own words.",about_how_body3:'We pair those stories with rigorous research, accessible data, and a clear policy framework. Because proof matters — and decision-makers need both the human story and the evidence to act.',about_values_label:'Our values',about_values_title:'How We Work',gi_hero_title:'Get Involved',gi_hero_body:"Safe First Response is already working. What happens next depends on whether enough people — in the right positions — see it, believe it, and invest in it.",aud1_title:'Policymakers & City Leaders',aud2_title:'Program Leaders & Practitioners',aud3_title:'Community Advocates',aud4_title:'Funders & Philanthropists',gi_contact_title:'We want to hear from you.',gi_contact_body:"Whether you're a program leader, policymaker, journalist, or community member — we want to hear from you."};
 
-  misc_truth_0: "Unarmed response dramatically reduces escalation",
-  misc_truth_1: "Responders are trained professionals",
-  misc_truth_2: "Safe First Response saves public dollars",
-  misc_truth_3: "These models work in cities and rural communities",
-  misc_truth_4: "This strengthens — not weakens — public safety",
+const STEP_META=[{num:1,key:'step1',label:'Stage 01',program:'CAHOOTS · Eugene, OR'},{num:2,key:'step2',label:'Stage 02',program:'STAR · Denver, CO'},{num:3,key:'step3',label:'Stage 03',program:'HEART · Durham, NC'},{num:4,key:'step4',label:'Stage 04',program:'CAHOOTS · Eugene, OR'},{num:5,key:'step5',label:'Stage 05',program:'ECCO · Austin, TX'},{num:6,key:'step6',label:'Stage 06',program:'Safe Streets · Minneapolis, MN'},{num:7,key:'step7',label:'Stage 07',program:'Multiple Programs'}];
+const STEP_FIELDS=[{s:'_title',l:'Accordion Tab Label',h:'Short title in collapsed list',r:1},{s:'_hero_title',l:'Hero Title',h:'Large title in dark panel. Use &lt;br&gt; for line breaks.',r:2},{s:'_hero_caption',l:'Hero Caption',h:'Sentence under the hero title',r:2},{s:'_narr_label1',l:'Narrative Label 1',h:'Small caps label — first column',r:1},{s:'_narr_label2',l:'Narrative Label 2',h:'Small caps label — second column',r:1},{s:'_quote',l:'Pull Quote',h:'First-person quote in italic gold',r:3},{s:'_attribution',l:'Attribution',h:'— Name, Role, Program',r:1},{s:'_spread_body',l:'Spread Body',h:'Paragraph beside the pull quote',r:4},{s:'_prog_stat',l:'Program Stat',h:'Big number (e.g. "17%", "Pilot")',r:1},{s:'_prog_stat_label',l:'Stat Label',h:'Description below the stat',r:1},{s:'_prog_quote',l:'Program Card Quote',h:'Closing quote on dark program card',r:2}];
+const SECTION_LABELS={home_hero:'Hero',home_intro:'Introduction',home_video:'Video Teaser',home_misc:'Misconceptions',home_map:'Map + Stats',home_news:'In the News',home_end:'End Block',resp_intro:'Response — Intro',resp_c1:'Pre-Response Diversion',resp_steps:'Response — 7 Steps',resp_c3:'Alternate Destinations',resp_c4:'Second Response',responders:'Responders',evidence:'Evidence',about:'About',gi:'Get Involved'};
 
-  resp_hero_title: "How Safe First Response Works",
-  resp_archive_title: "Meet the Responders",
+let content={},currentSection='home_hero',currentStep=0,saveTimer=null;
 
-  // Steps
-  step1_title: "A concern, not a crime",
-  step1_hero_title: "A concern, not a crime",
-  step1_quote: '"Most of what we respond to, nobody needed police. They needed somebody."',
+function loadContent(){try{const s=localStorage.getItem('12mc_content');content=s?{...DEFAULTS,...JSON.parse(s)}:{...DEFAULTS};}catch(e){content={...DEFAULTS};}}
+function saveContent(){localStorage.setItem('12mc_content',JSON.stringify(content));const s=document.getElementById('save-status');s.textContent='Saved ✓';s.classList.add('saved');setTimeout(()=>{s.textContent='All changes saved';s.classList.remove('saved');},2000);markEdits();}
+function markEdits(){document.querySelectorAll('.sb-item').forEach(btn=>{const sec=btn.dataset.section;if(!sec)return;const keys=getSectionKeys(sec);btn.classList.toggle('has-edits',keys.some(k=>content[k]!==undefined&&content[k]!==DEFAULTS[k]));});}
+function getSectionKeys(sec){return Object.keys(DEFAULTS).filter(k=>{if(sec==='home_hero')return k.startsWith('home_hero');if(sec==='home_intro')return k.startsWith('home_intro');if(sec==='home_video')return k.startsWith('home_video')||k.startsWith('home_vid');if(sec==='home_misc')return k.startsWith('home_misc')||k.startsWith('misc_');if(sec==='home_map')return k.startsWith('home_map');if(sec==='home_news')return k.startsWith('home_news')||k.startsWith('news_');if(sec==='home_end')return k==='home_end_headline';if(sec==='resp_intro')return k==='resp_hero_title'||k==='resp_hero_body';if(sec==='resp_c1')return k.startsWith('resp_c1')||k==='resp_c2_label'||k==='resp_c2_title'||k==='resp_c2_sub';if(sec==='resp_steps')return k.startsWith('step');if(sec==='resp_c3')return k.startsWith('resp_c3')||k.startsWith('dest');if(sec==='resp_c4')return k.startsWith('resp_c4');if(sec==='responders')return['resp_eyebrow','resp_archive_title','resp_archive_body','resp_more_label'].includes(k);if(sec==='evidence')return k.startsWith('ev_')||k.startsWith('finding_')||k.startsWith('stat')||k.startsWith('report');if(sec==='about')return k.startsWith('about_');if(sec==='gi')return k.startsWith('gi_')||k.startsWith('aud');return false;});}
+function wire(container){container.querySelectorAll('.fi').forEach(el=>{const key=el.dataset.key;if(!key)return;el.value=content[key]??DEFAULTS[key]??'';el.classList.toggle('modified',el.value!==(DEFAULTS[key]??''));autosize(el);el.addEventListener('input',function(){content[key]=this.value;this.classList.toggle('modified',this.value!==(DEFAULTS[key]??''));autosize(this);clearTimeout(saveTimer);saveTimer=setTimeout(saveContent,500);});});}
+function autosize(el){el.style.height='auto';el.style.height=el.scrollHeight+'px';}
+function show(id,btn){document.querySelectorAll('.section-nav').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));document.getElementById('sec-'+id).classList.add('active');if(btn)btn.classList.add('active');document.getElementById('section-label').textContent=SECTION_LABELS[id]||id;currentSection=id;if(id==='resp_steps'){showStep(currentStep,document.querySelectorAll('.step-tab')[currentStep]);}else{wire(document.getElementById('sec-'+id));}}
+function showStep(idx,btn){currentStep=idx;document.querySelectorAll('.step-tab').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');const m=STEP_META[idx];const c=document.getElementById('step-fields');c.innerHTML=`<div style="padding:12px 18px 14px;border-bottom:1px solid var(--border);"><div style="font-size:.6rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:3px;">${m.label}</div><div style="font-size:.76rem;color:var(--text-muted);">${m.program}</div></div>${STEP_FIELDS.map(f=>`<div class="fr"><div class="fl"><span class="fl-label">${f.l}</span><span class="fl-hint">${f.h}</span><span class="fl-key">${m.key}${f.s}</span></div><div class="fi-col"><textarea class="fi" data-key="${m.key}${f.s}" rows="${f.r}"></textarea></div></div>`).join('')}`;wire(c);}
+function resetSection(){if(!confirm('Reset this section to defaults?'))return;getSectionKeys(currentSection).forEach(k=>{content[k]=DEFAULTS[k];});saveContent();document.querySelector('.sb-item.active')?.click();showToast('Section reset to defaults');}
+async function exportSite(){showToast('Generating...');try{const res=await fetch('index.html');let html=await res.text();const doc=new DOMParser().parseFromString(html,'text/html');Object.entries(content).forEach(([k,v])=>{const el=doc.querySelector(`[data-cms="${k}"]`);if(el&&v!=null)el.innerHTML=v;});doc.querySelectorAll('script').forEach(s=>{if(s.textContent.includes('12mc_content')&&s.textContent.includes('localStorage.getItem'))s.remove();});const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['<!DOCTYPE html>\n'+doc.documentElement.outerHTML],{type:'text/html'}));a.download='index.html';a.click();URL.revokeObjectURL(a.href);showToast('Exported — upload to GitHub to redeploy');}catch(e){showToast('Export failed — run from web server, not file://');}}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200);}
 
-  step2_title: "Triage at 911",
-  step2_hero_title: "Triage at 911",
-  step2_quote: '"We trained side by side with dispatch. They know us, they trust us. That trust is the whole system."',
-
-  step3_title: "Initial assessment on arrival",
-  step3_hero_title: "The first two minutes",
-  step3_quote: '"I park half a block away sometimes. I want them to see me coming. I want them to see that I\'m not rushing."',
-
-  step4_title: "Engagement",
-  step4_hero_title: "The conversation that changes everything",
-  step4_quote: '"I just sit with them. Sometimes for a long time. That\'s the work."',
-
-  step5_title: "De-escalation",
-  step5_hero_title: "De-escalation is a clinical skill",
-  step5_quote: '"We don\'t wing it. Every technique I use, I was trained in. I practiced it. I know why it works."',
-
-  step6_title: "Deeper assessment",
-  step6_hero_title: "What does this person actually need?",
-  step6_quote: '"The call said welfare check. What I found was a man who hadn\'t eaten in three days, whose lights had been cut off, and who hadn\'t talked to anyone in a week. That\'s not a welfare check. That\'s a system failing someone."',
-
-  step7_title: "Resolution",
-  step7_hero_title: "The concern is addressed.<br>The person is supported.",
-  step7_quote: '"The call is closed, but I still think about him. I followed up. He got housed. That\'s why I do this work."',
-
-  ev_hero_title: "The Evidence Is Clear",
-  ev_findings_headline: "The findings point in the same direction",
-  finding_safe_title: "It's safe.",
-  finding_works_title: "It works.",
-  finding_money_title: "It saves money.",
-  finding_police_title: "Police support it.",
-
-  about_hero_title: "About This Project",
-  about_why_title: "Why This Moment Matters",
-  about_pull_quote: "The gap isn't evidence. The gap is awareness, imagination, and political will.",
-
-  gi_hero_title: "Get Involved",
-};
-
-const STEP_META = [
-  { num: 1, key: 'step1', label: 'Stage 01', program: 'CAHOOTS · Eugene, OR' },
-  { num: 2, key: 'step2', label: 'Stage 02', program: 'STAR · Denver, CO' },
-  { num: 3, key: 'step3', label: 'Stage 03', program: 'HEART · Durham, NC' },
-  { num: 4, key: 'step4', label: 'Stage 04', program: 'CAHOOTS · Eugene, OR' },
-  { num: 5, key: 'step5', label: 'Stage 05', program: 'ECCO · Austin, TX' },
-  { num: 6, key: 'step6', label: 'Stage 06', program: 'Safe Streets · Minneapolis' },
-  { num: 7, key: 'step7', label: 'Stage 07', program: 'Multiple Programs' },
-];
-
-const STEP_FIELD_DEFS = [
-  { suffix: '_title', label: 'Accordion Tab Label', hint: 'Short title shown in collapsed list', rows: 1 },
-  { suffix: '_hero_title', label: 'Hero Title', hint: 'Large cinematic title in dark panel', rows: 2 },
-  { suffix: '_quote', label: 'Pull Quote', hint: 'First-person quote — will appear in italic, gold', rows: 3 },
-];
-
-// ===================== STATE =====================
-let currentContent = {};
-let currentSection = 'home';
-let currentStep = 0;
-let saveTimer = null;
-
-// Load saved content
-function loadContent() {
-  try {
-    const saved = localStorage.getItem('12mc_content');
-    currentContent = saved ? { ...DEFAULTS, ...JSON.parse(saved) } : { ...DEFAULTS };
-  } catch(e) {
-    currentContent = { ...DEFAULTS };
-  }
-}
-
-function saveContent() {
-  localStorage.setItem('12mc_content', JSON.stringify(currentContent));
-  const status = document.getElementById('save-status');
-  status.textContent = 'Saved ✓';
-  status.classList.add('saved');
-  setTimeout(() => {
-    status.textContent = 'All changes saved';
-    status.classList.remove('saved');
-  }, 2000);
-  markSidebarEdits();
-}
-
-function markSidebarEdits() {
-  document.querySelectorAll('.sidebar-item').forEach(btn => {
-    const section = btn.dataset.section;
-    if (!section) return;
-    const hasEdits = Object.keys(currentContent).some(k => {
-      const sectionPrefix = getSectionPrefix(section);
-      return sectionPrefix && k.startsWith(sectionPrefix) && currentContent[k] !== DEFAULTS[k];
-    });
-    btn.classList.toggle('has-edits', hasEdits);
-  });
-}
-
-function getSectionPrefix(section) {
-  const map = { home: 'home_', misc: 'misc_', response_hero: 'resp_hero', steps: 'step', responders: 'resp_archive', evidence: 'ev_|finding_', about: 'about_', gi: 'gi_' };
-  return map[section] || null;
-}
-
-// ===================== FIELD WIRING =====================
-function wireFields(container) {
-  container.querySelectorAll('.field-input').forEach(input => {
-    const key = input.dataset.key;
-    if (!key) return;
-
-    // Set current value
-    input.value = currentContent[key] ?? DEFAULTS[key] ?? '';
-
-    // Mark if modified
-    if (currentContent[key] !== undefined && currentContent[key] !== DEFAULTS[key]) {
-      input.classList.add('modified');
-    }
-
-    // Auto-resize
-    autoResize(input);
-
-    input.addEventListener('input', function() {
-      currentContent[key] = this.value;
-      this.classList.toggle('modified', this.value !== DEFAULTS[key]);
-      autoResize(this);
-      clearTimeout(saveTimer);
-      saveTimer = setTimeout(saveContent, 600);
-    });
-  });
-}
-
-function autoResize(el) {
-  el.style.height = 'auto';
-  el.style.height = el.scrollHeight + 'px';
-}
-
-// ===================== SECTION NAV =====================
-const SECTION_LABELS = {
-  home: 'Homepage',
-  misc: 'Misconceptions Accordion',
-  response_hero: 'Response — Page Intro',
-  steps: 'Response — In-Person Steps',
-  responders: 'Responders',
-  evidence: 'Evidence',
-  about: 'About',
-  gi: 'Get Involved',
-};
-
-function showSection(id, btn) {
-  document.querySelectorAll('.section-nav').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
-  document.getElementById('section-' + id).classList.add('active');
-  btn.classList.add('active');
-  document.getElementById('section-label').textContent = SECTION_LABELS[id] || id;
-  currentSection = id;
-
-  if (id === 'steps') {
-    showStep(currentStep, document.querySelectorAll('.step-select-btn')[currentStep]);
-  } else {
-    wireFields(document.getElementById('section-' + id));
-  }
-}
-
-// ===================== STEP EDITOR =====================
-function showStep(idx, btn) {
-  currentStep = idx;
-  document.querySelectorAll('.step-select-btn').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-
-  const meta = STEP_META[idx];
-  const container = document.getElementById('step-fields');
-
-  container.innerHTML = `
-    <div style="padding: 0 20px 20px;">
-      <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);margin-bottom:4px;">${meta.label}</div>
-      <div style="font-size:0.78rem;color:var(--text-muted);">${meta.program}</div>
-    </div>
-    ${STEP_FIELD_DEFS.map(def => `
-    <div class="field-row">
-      <div class="field-label-col">
-        <span class="field-label">${def.label}</span>
-        <span class="field-hint">${def.hint}</span>
-        <span class="field-key">${meta.key}${def.suffix}</span>
-      </div>
-      <div class="field-input-col">
-        <textarea class="field-input" data-key="${meta.key}${def.suffix}" rows="${def.rows}"></textarea>
-      </div>
-    </div>`).join('')}
-  `;
-  wireFields(container);
-}
-
-// ===================== RESET SECTION =====================
-function resetSection() {
-  if (!confirm('Reset all fields in this section to defaults? This cannot be undone.')) return;
-  const keys = Object.keys(currentContent).filter(k => {
-    const prefix = getSectionPrefix(currentSection);
-    return prefix && new RegExp('^(' + prefix + ')').test(k);
-  });
-  keys.forEach(k => { currentContent[k] = DEFAULTS[k]; });
-  saveContent();
-  // Re-render current section
-  const btn = document.querySelector('.sidebar-item.active');
-  if (btn) { btn.click(); }
-  showToast('Section reset to defaults');
-}
-
-// ===================== PREVIEW =====================
-function openPreview() {
-  window.open('index.html', '_blank');
-}
-
-// ===================== EXPORT =====================
-async function exportSite() {
-  showToast('Generating export...');
-  try {
-    const res = await fetch('index.html');
-    let html = await res.text();
-
-    // Replace all data-cms elements with current content
-    // We'll use a proper DOM approach via DOMParser
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-
-    Object.entries(currentContent).forEach(([key, val]) => {
-      const el = doc.querySelector(`[data-cms="${key}"]`);
-      if (el) el.innerHTML = val;
-    });
-
-    // Remove the localStorage reader script from export (bake it in)
-    doc.querySelectorAll('script').forEach(s => {
-      if (s.textContent.includes('12mc_content') && s.textContent.includes('localStorage.getItem')) {
-        s.remove();
-      }
-    });
-
-    const exportHtml = '<!DOCTYPE html>\n' + doc.documentElement.outerHTML;
-    const blob = new Blob([exportHtml], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'index.html';
-    a.click();
-    URL.revokeObjectURL(url);
-    showToast('Exported! Upload index.html to GitHub to redeploy.');
-  } catch(e) {
-    showToast('Export failed — make sure you\'re running from a web server (not file://)');
-    console.error(e);
-  }
-}
-
-// ===================== TOAST =====================
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
-}
-
-// ===================== INIT =====================
 loadContent();
-// Wire the initially visible section
-wireFields(document.getElementById('section-home'));
-markSidebarEdits();
+wire(document.getElementById('sec-home_hero'));
+markEdits();
 </script>
 </body>
 </html>
