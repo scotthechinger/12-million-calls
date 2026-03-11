@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Content Editor — 12 Million Calls</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,300&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f2ec;
+    --surface: #ffffff;
+    --border: rgba(26,23,16,0.1);
+    --border-strong: rgba(26,23,16,0.2);
+    --text: #1a1710;
+    --text-muted: rgba(26,23,16,0.5);
+    --text-dim: rgba(26,23,16,0.35);
+    --accent: #b5873c;
+    --accent-bg: rgba(181,135,60,0.08);
+    --sidebar-bg: #1a1710;
+    --sidebar-text: rgba(245,242,236,0.75);
+    --sidebar-active: rgba(181,135,60,0.15);
+    --sidebar-active-text: #c9a96e;
+    --saved-green: #2d7a4e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Barlow', sans-serif; font-weight: 300; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar {
+    width: 240px; flex-shrink: 0; background: var(--sidebar-bg);
+    display: flex; flex-direction: column; overflow: hidden;
+    border-right: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .sidebar-header {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .sidebar-logo {
+    font-family: 'Fraunces', serif; font-size: 0.88rem; color: #f0ede6; font-weight: 400; display: block; margin-bottom: 4px;
+  }
+  .sidebar-sub {
+    font-size: 0.62rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--accent); opacity: 0.7;
+  }
+
+  .sidebar-nav { flex: 1; overflow-y: auto; padding: 12px 0; }
+  .sidebar-section-header {
+    font-size: 0.55rem; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase;
+    color: rgba(245,242,236,0.2); padding: 14px 20px 6px; margin-top: 4px;
+  }
+  .sidebar-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 20px; cursor: pointer; transition: all 0.15s;
+    font-size: 0.8rem; color: var(--sidebar-text); border: none; background: none;
+    width: 100%; text-align: left;
+  }
+  .sidebar-item:hover { background: rgba(255,255,255,0.04); color: #f0ede6; }
+  .sidebar-item.active { background: var(--sidebar-active); color: var(--sidebar-active-text); }
+  .sidebar-item-dot {
+    width: 5px; height: 5px; border-radius: 50%; background: var(--accent); opacity: 0.4; flex-shrink: 0; transition: opacity 0.15s;
+  }
+  .sidebar-item.active .sidebar-item-dot,
+  .sidebar-item.has-edits .sidebar-item-dot { opacity: 1; }
+
+  .sidebar-footer {
+    padding: 14px 16px; border-top: 1px solid rgba(255,255,255,0.07);
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .btn-export {
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+    background: var(--accent); color: #1a1710; border: none; padding: 10px 0;
+    cursor: pointer; transition: background 0.2s; width: 100%; border-radius: 1px;
+  }
+  .btn-export:hover { background: #c9a96e; }
+  .btn-preview {
+    font-size: 0.7rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+    background: transparent; color: rgba(245,242,236,0.5); border: 1px solid rgba(255,255,255,0.1);
+    padding: 9px 0; cursor: pointer; transition: all 0.2s; width: 100%;
+  }
+  .btn-preview:hover { color: #f0ede6; border-color: rgba(255,255,255,0.3); }
+
+  /* ===== MAIN EDITOR ===== */
+  .editor-main {
+    flex: 1; overflow-y: auto; display: flex; flex-direction: column;
+  }
+
+  .editor-topbar {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 32px; height: 52px; display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 10; flex-shrink: 0;
+  }
+  .editor-topbar-title {
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent);
+  }
+  .editor-topbar-right { display: flex; align-items: center; gap: 16px; }
+  .save-status {
+    font-size: 0.7rem; font-weight: 400; color: var(--text-dim); transition: color 0.3s;
+  }
+  .save-status.saved { color: var(--saved-green); }
+  .btn-reset-section {
+    font-size: 0.65rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text-dim); background: none; border: 1px solid var(--border); padding: 6px 14px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-reset-section:hover { color: var(--text); border-color: var(--border-strong); }
+
+  .editor-body { padding: 32px; flex: 1; }
+
+  /* FIELD GROUPS */
+  .field-group {
+    background: var(--surface); border: 1px solid var(--border); margin-bottom: 20px;
+    border-radius: 2px; overflow: hidden;
+  }
+  .field-group-header {
+    padding: 14px 20px; background: var(--bg); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .field-group-title {
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent);
+  }
+  .field-group-desc {
+    font-size: 0.72rem; color: var(--text-muted); margin-left: auto;
+  }
+
+  .field-row {
+    display: grid; grid-template-columns: 180px 1fr; border-bottom: 1px solid var(--border);
+  }
+  .field-row:last-child { border-bottom: none; }
+
+  .field-label-col {
+    padding: 16px 20px; background: rgba(26,23,16,0.015); border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .field-label {
+    font-size: 0.72rem; font-weight: 500; color: var(--text); line-height: 1.3;
+  }
+  .field-hint {
+    font-size: 0.65rem; color: var(--text-dim); line-height: 1.4;
+  }
+  .field-key {
+    font-size: 0.58rem; font-family: monospace; color: rgba(26,23,16,0.25); margin-top: 4px;
+  }
+
+  .field-input-col { padding: 12px 16px; display: flex; align-items: flex-start; }
+
+  .field-input {
+    width: 100%; background: transparent; border: none; outline: none;
+    font-family: 'Barlow', sans-serif; font-size: 0.88rem; font-weight: 300;
+    color: var(--text); line-height: 1.55; resize: none; min-height: 36px;
+    padding: 4px 0; transition: background 0.15s; border-radius: 0;
+  }
+  .field-input:focus { background: var(--accent-bg); padding: 4px 8px; margin: 0 -8px; width: calc(100% + 16px); }
+  .field-input.modified { color: var(--accent-dark, #8a6228); }
+
+  /* SECTION PLACEHOLDER */
+  .section-placeholder {
+    display: flex; align-items: center; justify-content: center; flex-direction: column;
+    gap: 12px; min-height: 300px; color: var(--text-dim); text-align: center;
+  }
+  .section-placeholder h3 { font-family: 'Fraunces', serif; font-weight: 400; font-size: 1.2rem; color: var(--text-muted); }
+  .section-placeholder p { font-size: 0.82rem; }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 24px; right: 24px; background: var(--text); color: #f0ede6;
+    padding: 12px 20px; font-size: 0.78rem; font-weight: 500; opacity: 0;
+    transition: opacity 0.3s; pointer-events: none; z-index: 999;
+  }
+  .toast.show { opacity: 1; }
+
+  /* CHARACTER COUNT */
+  .char-count {
+    font-size: 0.6rem; color: var(--text-dim); margin-top: 4px; text-align: right; flex-shrink: 0;
+    align-self: flex-end; padding-left: 8px; white-space: nowrap;
+  }
+
+  /* STEP SELECTOR (for response page) */
+  .step-selector {
+    display: flex; gap: 2px; padding: 16px 20px 0; flex-wrap: wrap;
+  }
+  .step-select-btn {
+    font-size: 0.65rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 7px 14px; background: var(--bg); border: 1px solid var(--border);
+    cursor: pointer; transition: all 0.15s; color: var(--text-muted);
+  }
+  .step-select-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  /* PAGES NAV (inside editor for sections) */
+  .section-nav { display: none; }
+  .section-nav.active { display: block; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <span class="sidebar-logo">12 Million Calls</span>
+    <span class="sidebar-sub">Content Editor</span>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="sidebar-section-header">Global</div>
+    <button class="sidebar-item active" data-section="home" onclick="showSection('home', this)">
+      <span class="sidebar-item-dot"></span> Homepage
+    </button>
+    <button class="sidebar-item" data-section="misc" onclick="showSection('misc', this)">
+      <span class="sidebar-item-dot"></span> Misconceptions
+    </button>
+
+    <div class="sidebar-section-header">Pages</div>
+    <button class="sidebar-item" data-section="response_hero" onclick="showSection('response_hero', this)">
+      <span class="sidebar-item-dot"></span> Response — Intro
+    </button>
+    <button class="sidebar-item" data-section="steps" onclick="showSection('steps', this)">
+      <span class="sidebar-item-dot"></span> Response — 7 Steps
+    </button>
+    <button class="sidebar-item" data-section="responders" onclick="showSection('responders', this)">
+      <span class="sidebar-item-dot"></span> Responders
+    </button>
+    <button class="sidebar-item" data-section="evidence" onclick="showSection('evidence', this)">
+      <span class="sidebar-item-dot"></span> Evidence
+    </button>
+    <button class="sidebar-item" data-section="about" onclick="showSection('about', this)">
+      <span class="sidebar-item-dot"></span> About
+    </button>
+    <button class="sidebar-item" data-section="gi" onclick="showSection('gi', this)">
+      <span class="sidebar-item-dot"></span> Get Involved
+    </button>
+  </nav>
+
+  <div class="sidebar-footer">
+    <button class="btn-preview" onclick="openPreview()">↗ Preview Site</button>
+    <button class="btn-export" onclick="exportSite()">⬇ Export index.html</button>
+  </div>
+</aside>
+
+<!-- EDITOR MAIN -->
+<main class="editor-main">
+
+  <div class="editor-topbar">
+    <span class="editor-topbar-title" id="section-label">Homepage</span>
+    <div class="editor-topbar-right">
+      <span class="save-status" id="save-status">All changes saved</span>
+      <button class="btn-reset-section" onclick="resetSection()">Reset section</button>
+    </div>
+  </div>
+
+  <div class="editor-body">
+
+    <!-- ===== HOME ===== -->
+    <div id="section-home" class="section-nav active">
+      <div class="field-group">
+        <div class="field-group-header">
+          <span class="field-group-title">Hero</span>
+          <span class="field-group-desc">Top of homepage — first thing visitors see</span>
+        </div>
+        <div class="field-row">
+          <div class="field-label-col"><span class="field-label">Eyebrow</span><span class="field-hint">Small label above headline</span><span class="field-key">home_hero_eyebrow</span></div>
+          <div class="field-input-col"><textarea class="field-input" data-key="home_hero_eyebrow" rows="1">Safe First Response</textarea></div>
+        </div>
+        <div class="field-row">
+          <div class="field-label-col"><span class="field-label">Headline</span><span class="field-hint">Main hero headline. Use &lt;br&gt; for line breaks, &lt;em&gt; for italic/gold text</span><span class="field-key">home_hero_headline</span></div>
+          <div class="field-input-col"><textarea class="field-input" data-key="home_hero_headline" rows="3">Police receive over 240 million<br><em>911 calls</em> each year.</textarea></div>
+        </div>
+        <div class="field-row">
+          <div class="field-label-col"><span class="field-label">Subtitle</span><span class="field-hint">One sentence below headline</span><span class="field-key">home_hero_sub</span></div>
+          <div class="field-input-col"><textarea class="field-input" data-key="home_hero_sub" rows="2">What if even a small share were routed to responders trained to meet people's actual needs?</textarea></div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-group-header">
+          <span class="field-group-title">Introduction Block</span>
+          <span class="field-group-desc">Plain-language explanation below hero</span>
+        </div>
+        <div class="field-row">
+          <div class="field-label-col"><span class="field-label">Section Label</span><span class="field-hint">Small caps above heading</span><span class="field-key">home_intro_label</span></div>
+          <div class="field-input-col"><textarea class="field-input" data-key="home_intro_label" rows="1">What is Safe First Response?</textarea></div>
+        </div>
+        <div class="field-row">
+          <div class="field-label-col"><span class="field-label">Body Text</span><span class="field-hint">Main explanatory paragraph</span><span class="field-key">home_intro_body</span></div>
+          <div class="field-input-col"><textarea class="field-input" data-key="home_intro_body" rows="4">In cities and towns across the country, trained responders are handling 911 calls that do not require police. These unarmed safety responders address concerns involving mental health, substance use, disputes, and welfare checks — resolving issues with care, reducing harm, and improving public safety.</textarea></div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-group-header">
+          <span class="field-group-title">Video Archive Teaser</span>
+        </div>
+        <div class="field-row">
+          <div class="field-label-col"><span class="field-label">Headline</span><span class="field-key">home_video_headline</span></div>
+          <div class="field-input-col"><textarea class="field-input" data-key="home_video_headline" rows="2">Hear directly from the people doing this work —<br>in their own words.</textarea></div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-group-header">
+          <span class="field-group-title">Map Entry Point</span>
+        </div>
+        <div class="field-row">
+          <div class="field-label-col"><span class="field-label">Headline</span><span class="field-key">home_map_headline</span></div>
+          <div class="field-input-col"><textarea class="field-input" data-key="home_map_headline" rows="2">What patterns emerge when millions of calls are handled differently?</textarea></div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-group-header">
+          <span class="field-group-title">End of Page Block</span>
+          <span class="field-group-desc">About / Get Involved section at bottom of homepage</span>
+        </div>
+        <div class="field-row">
+          <div class="field-label-col"><span class="field-label">Headline</span><span class="field-key">home_end_headline</span></div>
+          <div class="field-input-col"><textarea class="field-input" data-key="home_end_headline" rows="3">This project is led by the Policing Project in partnership with practitioners, researchers, and communities across the country.</textarea></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MISCONCEPTIONS ===== -->
+    <div id="section-misc" class="section-nav">
+      <div class="field-group">
+        <div class="field-group-header">
+          <span class="field-group-title">Misconceptions Accordion</span>
+          <span class="field-group-desc">Left column = clickable truth statement. Right column = detail that expands.</span>
+        </div>
+
+        <div class="field-row" style="background:var(--accent-bg);">
+          <div class="field-label-col"><span class="field-label">Truth 1 — Left</span><span class="field-hint">Clickable statement</span><span class="field-key">misc_truth_0</span></div>
+          <div class="field-input-col"><textarea class="field-input" data-key="misc_truth_0" rows="2">Unarmed response dramatically reduces escalation</textarea></div>
+        </div>
+        <div class="field-row">
+          <div class="field-label-col"><span class="field-label">Truth 2 — Left</span><span class="field-key">misc_truth_1</span></div>
+          <div class="field-input-col"><textarea class="field-input" data-key="misc_truth_1" rows="2">Responders are trained professionals</textarea></div>
+        </div>
+        <div class="field-row">
+          <div class="field-label-col"><span class="field-label">Truth 3 — Left</span><span class="field-key">misc_truth_2</span></div>
+          <div class="field-input-col"><textarea class="field-input" data-key="misc_truth_2" rows="2">Safe First Response saves public dollars</textarea></div>
+        </div>
+        <div class="field-row">
+          <div class="field-label-col"><span class="field-label">Truth 4 — Left</span><span class="field-key">misc_truth_3</span></div>
+          <div class="field-input-col"><textarea class="field-input" data-key="misc_truth_3" rows="2">These models work in cities and rural communities</textarea></div>
+        </div>
+        <div class="field-row">
+          <div class="field-label-col"><span class="field-label">Truth 5 — Left</span><span class="field-key">misc_truth_4</span></div>
+          <div class="field-input-col"><textarea class="field-input" data-key="misc_truth_4" rows="2">This strengthens — not weakens — public safety</textarea></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== RESPONSE HERO ===== -->
+    <div id="section-response_hero" class="section-nav">
+      <div class="field-group">
+        <div class="field-group-header">
+          <span class="field-group-title">Response Page — Intro</span>
+        </div>
+        <div class="field-row">
+          <div class="field-label-col"><span class="field-label">Page Title</span><span class="field-key">resp_hero_title</span></div>
+          <div class="field-input-col"><textarea class="field-input" data-key="resp_hero_title" rows="1">How Safe First Response Works</textarea></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== STEPS ===== -->
+    <div id="section-steps" class="section-nav">
+      <div class="field-group">
+        <div class="field-group-header">
+          <span class="field-group-title">In-Person Response — 7 Steps</span>
+          <span class="field-group-desc">Select a step below to edit its content</span>
+        </div>
+        <div class="step-selector" id="step-selector">
+          <button class="step-select-btn active" onclick="showStep(0, this)">Step 1</button>
+          <button class="step-select-btn" onclick="showStep(1, this)">Step 2</button>
+          <button class="step-select-btn" onclick="showStep(2, this)">Step 3</button>
+          <button class="step-select-btn" onclick="showStep(3, this)">Step 4</button>
+          <button class="step-select-btn" onclick="showStep(4, this)">Step 5</button>
+          <button class="step-select-btn" onclick="showStep(5, this)">Step 6</button>
+          <button class="step-select-btn" onclick="showStep(6, this)">Step 7</button>
+        </div>
+        <div id="step-fields" style="padding: 16px 0 0;"></div>
+      </div>
+    </div>
+
+    <!-- ===== RESPONDERS ===== -->
+    <div id="section-responders" class="section-nav">
+      <div class="field-group">
+        <div class="field-group-header">
+          <span class="field-group-title">Responders Page</span>
+        </div>
+        <div class="field-row">
+          <div class="field-label-col"><span class="field-label">Page Title</span><span class="field-key">resp_archive_title</span></div>
+          <div class="field-input-col"><textarea class="field-input" data-key="resp_archive_title" rows="1">Meet the Responders</textarea></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== EVIDENCE ===== -->
+    <div id="section-evidence" class="section-nav">
+      <div class="field-group">
+        <div class="field-group-header">
+          <span class="field-group-title">Evidence Page</span>
+        </div>
+        <div class="field-row">
+          <div class="field-label-col"><span class="field-label">Page Title</span><span class="field-key">ev_hero_title</span></div>
+          <div class="field-input-col"><textarea class="field-input" data-key="ev_hero_title" rows="1">The Evidence Is Clear</textarea></div>
+        </div>
+        <div class="field-row">
+          <div class="field-label-col"><span class="field-label">Findings Headline</span><span class="field-key">ev_findings_headline</span></div>
+          <div class="field-input-col"><textarea class="field-input" data-key="ev_findings_headline" rows="1">The findings point in the same direction</textarea></div>
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="field-group-header">
+          <span class="field-group-title">Finding Cards</span>
+          <span class="field-group-desc">Four key findings shown at top of Evidence page</span>
+        </div>
+        <div class="field-row">
+          <div class="field-label-col"><span class="field-label">Finding 1 — Title</span><span class="field-hint">Short italic headline</span><span class="field-key">finding_safe_title</span></div>
+          <div class="field-input-col"><textarea class="field-input" data-key="finding_safe_title" rows="1">It's safe.</textarea></div>
+        </div>
+        <div class="field-row">
+          <div class="field-label-col"><span class="field-label">Finding 2 — Title</span><span class="field-key">finding_works_title</span></div>
+          <div class="field-input-col"><textarea class="field-input" data-key="finding_works_title" rows="1">It works.</textarea></div>
+        </div>
+        <div class="field-row">
+          <div class="field-label-col"><span class="field-label">Finding 3 — Title</span><span class="field-key">finding_money_title</span></div>
+          <div class="field-input-col"><textarea class="field-input" data-key="finding_money_title" rows="1">It saves money.</textarea></div>
+        </div>
+        <div class="field-row">
+          <div class="field-label-col"><span class="field-label">Finding 4 — Title</span><span class="field-key">finding_police_title</span></div>
+          <div class="field-input-col"><textarea class="field-input" data-key="finding_police_title" rows="1">Police support it.</textarea></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== ABOUT ===== -->
+    <div id="section-about" class="section-nav">
+      <div class="field-group">
+        <div class="field-group-header"><span class="field-group-title">About Page</span></div>
+        <div class="field-row">
+          <div class="field-label-col"><span class="field-label">Page Title</span><span class="field-key">about_hero_title</span></div>
+          <div class="field-input-col"><textarea class="field-input" data-key="about_hero_title" rows="1">About This Project</textarea></div>
+        </div>
+        <div class="field-row">
+          <div class="field-label-col"><span class="field-label">Why This Moment — Title</span><span class="field-key">about_why_title</span></div>
+          <div class="field-input-col"><textarea class="field-input" data-key="about_why_title" rows="1">Why This Moment Matters</textarea></div>
+        </div>
+        <div class="field-row">
+          <div class="field-label-col"><span class="field-label">Pull Quote</span><span class="field-hint">Large italic statement in right column</span><span class="field-key">about_pull_quote</span></div>
+          <div class="field-input-col"><textarea class="field-input" data-key="about_pull_quote" rows="3">The gap isn't evidence. The gap is awareness, imagination, and political will.</textarea></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== GET INVOLVED ===== -->
+    <div id="section-gi" class="section-nav">
+      <div class="field-group">
+        <div class="field-group-header"><span class="field-group-title">Get Involved Page</span></div>
+        <div class="field-row">
+          <div class="field-label-col"><span class="field-label">Page Title</span><span class="field-key">gi_hero_title</span></div>
+          <div class="field-input-col"><textarea class="field-input" data-key="gi_hero_title" rows="1">Get Involved</textarea></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /editor-body -->
+</main>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===================== CONTENT MODEL =====================
+// Default content — mirrors what's in index.html
+const DEFAULTS = {
+  home_hero_eyebrow: 'Safe First Response',
+  home_hero_headline: 'Police receive over 240 million<br><em>911 calls</em> each year.',
+  home_hero_sub: "What if even a small share were routed to responders trained to meet people's actual needs?",
+  home_intro_label: 'What is Safe First Response?',
+  home_intro_body: "In cities and towns across the country, trained responders are handling 911 calls that do not require police. These unarmed safety responders address concerns involving mental health, substance use, disputes, and welfare checks — resolving issues with care, reducing harm, and improving public safety.",
+  home_video_headline: "Hear directly from the people doing this work —<br>in their own words.",
+  home_map_headline: "What patterns emerge when millions of calls are handled differently?",
+  home_end_headline: "This project is led by the Policing Project in partnership with practitioners, researchers, and communities across the country.",
+
+  misc_truth_0: "Unarmed response dramatically reduces escalation",
+  misc_truth_1: "Responders are trained professionals",
+  misc_truth_2: "Safe First Response saves public dollars",
+  misc_truth_3: "These models work in cities and rural communities",
+  misc_truth_4: "This strengthens — not weakens — public safety",
+
+  resp_hero_title: "How Safe First Response Works",
+  resp_archive_title: "Meet the Responders",
+
+  // Steps
+  step1_title: "A concern, not a crime",
+  step1_hero_title: "A concern, not a crime",
+  step1_quote: '"Most of what we respond to, nobody needed police. They needed somebody."',
+
+  step2_title: "Triage at 911",
+  step2_hero_title: "Triage at 911",
+  step2_quote: '"We trained side by side with dispatch. They know us, they trust us. That trust is the whole system."',
+
+  step3_title: "Initial assessment on arrival",
+  step3_hero_title: "The first two minutes",
+  step3_quote: '"I park half a block away sometimes. I want them to see me coming. I want them to see that I\'m not rushing."',
+
+  step4_title: "Engagement",
+  step4_hero_title: "The conversation that changes everything",
+  step4_quote: '"I just sit with them. Sometimes for a long time. That\'s the work."',
+
+  step5_title: "De-escalation",
+  step5_hero_title: "De-escalation is a clinical skill",
+  step5_quote: '"We don\'t wing it. Every technique I use, I was trained in. I practiced it. I know why it works."',
+
+  step6_title: "Deeper assessment",
+  step6_hero_title: "What does this person actually need?",
+  step6_quote: '"The call said welfare check. What I found was a man who hadn\'t eaten in three days, whose lights had been cut off, and who hadn\'t talked to anyone in a week. That\'s not a welfare check. That\'s a system failing someone."',
+
+  step7_title: "Resolution",
+  step7_hero_title: "The concern is addressed.<br>The person is supported.",
+  step7_quote: '"The call is closed, but I still think about him. I followed up. He got housed. That\'s why I do this work."',
+
+  ev_hero_title: "The Evidence Is Clear",
+  ev_findings_headline: "The findings point in the same direction",
+  finding_safe_title: "It's safe.",
+  finding_works_title: "It works.",
+  finding_money_title: "It saves money.",
+  finding_police_title: "Police support it.",
+
+  about_hero_title: "About This Project",
+  about_why_title: "Why This Moment Matters",
+  about_pull_quote: "The gap isn't evidence. The gap is awareness, imagination, and political will.",
+
+  gi_hero_title: "Get Involved",
+};
+
+const STEP_META = [
+  { num: 1, key: 'step1', label: 'Stage 01', program: 'CAHOOTS · Eugene, OR' },
+  { num: 2, key: 'step2', label: 'Stage 02', program: 'STAR · Denver, CO' },
+  { num: 3, key: 'step3', label: 'Stage 03', program: 'HEART · Durham, NC' },
+  { num: 4, key: 'step4', label: 'Stage 04', program: 'CAHOOTS · Eugene, OR' },
+  { num: 5, key: 'step5', label: 'Stage 05', program: 'ECCO · Austin, TX' },
+  { num: 6, key: 'step6', label: 'Stage 06', program: 'Safe Streets · Minneapolis' },
+  { num: 7, key: 'step7', label: 'Stage 07', program: 'Multiple Programs' },
+];
+
+const STEP_FIELD_DEFS = [
+  { suffix: '_title', label: 'Accordion Tab Label', hint: 'Short title shown in collapsed list', rows: 1 },
+  { suffix: '_hero_title', label: 'Hero Title', hint: 'Large cinematic title in dark panel', rows: 2 },
+  { suffix: '_quote', label: 'Pull Quote', hint: 'First-person quote — will appear in italic, gold', rows: 3 },
+];
+
+// ===================== STATE =====================
+let currentContent = {};
+let currentSection = 'home';
+let currentStep = 0;
+let saveTimer = null;
+
+// Load saved content
+function loadContent() {
+  try {
+    const saved = localStorage.getItem('12mc_content');
+    currentContent = saved ? { ...DEFAULTS, ...JSON.parse(saved) } : { ...DEFAULTS };
+  } catch(e) {
+    currentContent = { ...DEFAULTS };
+  }
+}
+
+function saveContent() {
+  localStorage.setItem('12mc_content', JSON.stringify(currentContent));
+  const status = document.getElementById('save-status');
+  status.textContent = 'Saved ✓';
+  status.classList.add('saved');
+  setTimeout(() => {
+    status.textContent = 'All changes saved';
+    status.classList.remove('saved');
+  }, 2000);
+  markSidebarEdits();
+}
+
+function markSidebarEdits() {
+  document.querySelectorAll('.sidebar-item').forEach(btn => {
+    const section = btn.dataset.section;
+    if (!section) return;
+    const hasEdits = Object.keys(currentContent).some(k => {
+      const sectionPrefix = getSectionPrefix(section);
+      return sectionPrefix && k.startsWith(sectionPrefix) && currentContent[k] !== DEFAULTS[k];
+    });
+    btn.classList.toggle('has-edits', hasEdits);
+  });
+}
+
+function getSectionPrefix(section) {
+  const map = { home: 'home_', misc: 'misc_', response_hero: 'resp_hero', steps: 'step', responders: 'resp_archive', evidence: 'ev_|finding_', about: 'about_', gi: 'gi_' };
+  return map[section] || null;
+}
+
+// ===================== FIELD WIRING =====================
+function wireFields(container) {
+  container.querySelectorAll('.field-input').forEach(input => {
+    const key = input.dataset.key;
+    if (!key) return;
+
+    // Set current value
+    input.value = currentContent[key] ?? DEFAULTS[key] ?? '';
+
+    // Mark if modified
+    if (currentContent[key] !== undefined && currentContent[key] !== DEFAULTS[key]) {
+      input.classList.add('modified');
+    }
+
+    // Auto-resize
+    autoResize(input);
+
+    input.addEventListener('input', function() {
+      currentContent[key] = this.value;
+      this.classList.toggle('modified', this.value !== DEFAULTS[key]);
+      autoResize(this);
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(saveContent, 600);
+    });
+  });
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
+}
+
+// ===================== SECTION NAV =====================
+const SECTION_LABELS = {
+  home: 'Homepage',
+  misc: 'Misconceptions Accordion',
+  response_hero: 'Response — Page Intro',
+  steps: 'Response — In-Person Steps',
+  responders: 'Responders',
+  evidence: 'Evidence',
+  about: 'About',
+  gi: 'Get Involved',
+};
+
+function showSection(id, btn) {
+  document.querySelectorAll('.section-nav').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('section-' + id).classList.add('active');
+  btn.classList.add('active');
+  document.getElementById('section-label').textContent = SECTION_LABELS[id] || id;
+  currentSection = id;
+
+  if (id === 'steps') {
+    showStep(currentStep, document.querySelectorAll('.step-select-btn')[currentStep]);
+  } else {
+    wireFields(document.getElementById('section-' + id));
+  }
+}
+
+// ===================== STEP EDITOR =====================
+function showStep(idx, btn) {
+  currentStep = idx;
+  document.querySelectorAll('.step-select-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  const meta = STEP_META[idx];
+  const container = document.getElementById('step-fields');
+
+  container.innerHTML = `
+    <div style="padding: 0 20px 20px;">
+      <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);margin-bottom:4px;">${meta.label}</div>
+      <div style="font-size:0.78rem;color:var(--text-muted);">${meta.program}</div>
+    </div>
+    ${STEP_FIELD_DEFS.map(def => `
+    <div class="field-row">
+      <div class="field-label-col">
+        <span class="field-label">${def.label}</span>
+        <span class="field-hint">${def.hint}</span>
+        <span class="field-key">${meta.key}${def.suffix}</span>
+      </div>
+      <div class="field-input-col">
+        <textarea class="field-input" data-key="${meta.key}${def.suffix}" rows="${def.rows}"></textarea>
+      </div>
+    </div>`).join('')}
+  `;
+  wireFields(container);
+}
+
+// ===================== RESET SECTION =====================
+function resetSection() {
+  if (!confirm('Reset all fields in this section to defaults? This cannot be undone.')) return;
+  const keys = Object.keys(currentContent).filter(k => {
+    const prefix = getSectionPrefix(currentSection);
+    return prefix && new RegExp('^(' + prefix + ')').test(k);
+  });
+  keys.forEach(k => { currentContent[k] = DEFAULTS[k]; });
+  saveContent();
+  // Re-render current section
+  const btn = document.querySelector('.sidebar-item.active');
+  if (btn) { btn.click(); }
+  showToast('Section reset to defaults');
+}
+
+// ===================== PREVIEW =====================
+function openPreview() {
+  window.open('index.html', '_blank');
+}
+
+// ===================== EXPORT =====================
+async function exportSite() {
+  showToast('Generating export...');
+  try {
+    const res = await fetch('index.html');
+    let html = await res.text();
+
+    // Replace all data-cms elements with current content
+    // We'll use a proper DOM approach via DOMParser
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    Object.entries(currentContent).forEach(([key, val]) => {
+      const el = doc.querySelector(`[data-cms="${key}"]`);
+      if (el) el.innerHTML = val;
+    });
+
+    // Remove the localStorage reader script from export (bake it in)
+    doc.querySelectorAll('script').forEach(s => {
+      if (s.textContent.includes('12mc_content') && s.textContent.includes('localStorage.getItem')) {
+        s.remove();
+      }
+    });
+
+    const exportHtml = '<!DOCTYPE html>\n' + doc.documentElement.outerHTML;
+    const blob = new Blob([exportHtml], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'index.html';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('Exported! Upload index.html to GitHub to redeploy.');
+  } catch(e) {
+    showToast('Export failed — make sure you\'re running from a web server (not file://)');
+    console.error(e);
+  }
+}
+
+// ===================== TOAST =====================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ===================== INIT =====================
+loadContent();
+// Wire the initially visible section
+wireFields(document.getElementById('section-home'));
+markSidebarEdits();
+</script>
+</body>
+</html>
