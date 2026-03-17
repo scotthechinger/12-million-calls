@@ -109,6 +109,39 @@
   }
   .btn-primary { background: var(--text); color: var(--bg); }
   .btn-primary:hover { background: var(--accent); }
+
+  .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 2rem; }
+
+  .btn-watch {
+    background: var(--accent); color: var(--bg);
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-watch::before { content: '▶'; font-size: 0.65em; }
+  .btn-watch:hover { background: var(--accent-dark); }
+
+  .btn-scroll {
+    background: transparent; color: var(--text);
+    border: 1.5px solid rgba(26,23,16,0.25);
+    letter-spacing: 0.08em;
+  }
+  .btn-scroll:hover { border-color: var(--text); background: rgba(26,23,16,0.05); }
+
+  /* Video modal */
+  .video-modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 9999;
+    background: rgba(0,0,0,0.82); align-items: center; justify-content: center;
+  }
+  .video-modal-overlay.open { display: flex; }
+  .video-modal-inner {
+    position: relative; width: min(860px, 92vw); aspect-ratio: 16/9;
+  }
+  .video-modal-inner iframe { width: 100%; height: 100%; border: none; }
+  .video-modal-close {
+    position: absolute; top: -38px; right: 0;
+    background: none; border: none; color: #fff; font-size: 1.5rem;
+    cursor: pointer; opacity: 0.7; line-height: 1;
+  }
+  .video-modal-close:hover { opacity: 1; }
   .btn-outline { background: transparent; color: var(--text); border: 1.5px solid var(--border-strong); }
   .btn-outline:hover { border-color: var(--text); }
   .btn-text { background: transparent; color: var(--accent); padding-left: 0; padding-right: 0; font-size: 0.78rem; }
@@ -157,7 +190,9 @@
   .hero-content {
     position: relative; z-index: 1;
     max-width: 1400px; margin: 0 auto; padding: 80px 48px 120px;
+    display: grid; grid-template-columns: 58% 1fr; align-items: start;
   }
+  .hero-text-col { display: flex; flex-direction: column; }
   .hero-eyebrow {
     font-size: 0.68rem; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase;
     color: var(--accent); margin-bottom: 1.8rem; display: flex; align-items: center; gap: 12px;
@@ -167,7 +202,7 @@
   .hero-headline {
     font-family: 'Fraunces', serif; font-size: clamp(3rem, 6.5vw, 6rem);
     font-weight: 400; line-height: 1.06; letter-spacing: -0.02em;
-    max-width: 18ch; margin-bottom: 1.8rem; color: var(--text);
+    margin-bottom: 1.8rem; color: var(--text);
   }
   .hero-headline em { font-style: italic; color: var(--accent); }
 
@@ -509,6 +544,7 @@
 
   @media (max-width: 900px) {
     .container, .container-wide, .nav-inner, .hero-content, .archive-grid { padding-left: 24px; padding-right: 24px; }
+    .hero-content { grid-template-columns: 1fr; }
     .intro-grid, .map-grid, .why-grid, .approach-grid, .contact-grid { grid-template-columns: 1fr; }
     .steps-grid { grid-template-columns: 1fr 1fr; }
     .findings-grid { grid-template-columns: 1fr 1fr; }
@@ -859,18 +895,24 @@
     <div class="hero-texture"></div>
     <div class="hero-accent-line"></div>
     <div class="hero-content">
-      <div class="hero-eyebrow" data-cms="home_hero_eyebrow">Safe First Response</div>
-      <p class="hero-sub" data-cms="home_hero_headline" style="margin-bottom:20px;">Police receive over <em style="font-style:italic;">240 million 911 calls</em> each year.</p>
-      <h1 class="hero-headline" data-cms="home_hero_sub">What if even a <span style="color:var(--accent);">small share of 911 calls</span> were routed to responders trained to meet people's actual needs?</h1>
-      <button class="btn btn-primary" onclick="showPage('response')">Explore Response</button>
-      <div class="inline-visual-note">
-        <span class="ivn-label">Visual</span>
-        <span class="ivn-text">Ambient video behind text — responders as professionals in real-world settings. Nothing overly literal. References: stillinprison.org, lethergohome.org, beyondthenow.us</span>
+      <div class="hero-text-col">
+        <div class="hero-eyebrow" data-cms="home_hero_eyebrow">Safe First Response</div>
+        <p class="hero-sub" data-cms="home_hero_headline" style="margin-bottom:20px;">Police receive over <em style="font-style:italic;">240 million calls</em> each year.</p>
+        <h1 class="hero-headline" data-cms="home_hero_sub">What if more 911 calls got the <span style="color:var(--accent);">right responder?</span></h1>
+        <div class="hero-btns">
+          <button class="btn btn-primary" onclick="showPage('response')">Explore Response</button>
+          <button class="btn btn-watch" onclick="openVideo()">Watch Video</button>
+          <button class="btn btn-scroll" onclick="document.getElementById('home-intro').scrollIntoView({behavior:'smooth'})">Learn More ↓</button>
+        </div>
+        <div class="inline-visual-note">
+          <span class="ivn-label">Visual</span>
+          <span class="ivn-text">Ambient video behind text — responders as professionals in real-world settings. Nothing overly literal. References: stillinprison.org, lethergohome.org, beyondthenow.us</span>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="intro-block">
+  <section class="intro-block" id="home-intro">
     <div class="container">
       <div class="intro-grid">
         <div>
@@ -2607,5 +2649,26 @@
 })();
 
   </script>
+<!-- Video modal -->
+<div class="video-modal-overlay" id="video-modal" onclick="closeVideo(event)">
+  <div class="video-modal-inner">
+    <button class="video-modal-close" onclick="closeVideo()">✕</button>
+    <iframe id="video-iframe" src="" allowfullscreen allow="autoplay"></iframe>
+  </div>
+</div>
+
+<script>
+function openVideo() {
+  document.getElementById('video-iframe').src = 'https://www.youtube.com/embed/0l_zfWqZi_k?autoplay=1';
+  document.getElementById('video-modal').classList.add('open');
+}
+function closeVideo(e) {
+  if (e && e.target !== document.getElementById('video-modal')) return;
+  document.getElementById('video-iframe').src = '';
+  document.getElementById('video-modal').classList.remove('open');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeVideo(); });
+</script>
+
 </body>
 </html>
